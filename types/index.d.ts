@@ -1,57 +1,52 @@
-// type User = {
-//   name: string;
-//   email: string;
-//   image?: string;
-//   accountId: string;
-// };
-
-enum Subject {
-  maths = "maths",
-  language = "language",
-  science = "science",
-  history = "history",
-  coding = "coding",
-  geography = "geography",
-  economics = "economics",
-  finance = "finance",
-  business = "business",
-}
-
-type Companion = Models.DocumentList<Models.Document> & {
-  $id: string;
-  name: string;
-  subject: Subject;
-  topic: string;
-  duration: number;
-  bookmarked: boolean;
-};
-
-interface CreateCompanion {
-  name: string;
-  subject: string;
-  topic: string;
-  voice: string;
-  style: string;
-  duration: number;
-}
-
-interface GetAllCompanions {
-  limit?: number;
-  page?: number;
-  subject?: string | string[];
-  topic?: string | string[];
-}
-
-interface BuildClient {
-  key?: string;
-  sessionToken?: string;
-}
-
+// User types (keep as is)
 interface CreateUser {
   email: string;
   name: string;
   image?: string;
   accountId: string;
+}
+
+// Reading Passage Types (NEW - replaces Companion)
+type ReadingPassage = {
+  id: string;
+  title: string;
+  content: string;
+  grade_level: string;
+  lexile_score: number | null;
+  lesson_type: "Phonics" | "Comprehension" | "Sight Words" | "Story" | "Mixed";
+  tags: string[];
+  subject: string | null;
+  word_count: number | null;
+  estimated_duration_minutes: number;
+  created_by: string | null;
+  is_public: boolean;
+  created_at: string;
+  updated_at: string;
+  bookmarked?: boolean; // For UI state
+};
+
+interface CreateReadingPassage {
+  title: string;
+  content: string;
+  grade_level: string;
+  lexile_score?: number;
+  lesson_type: "Phonics" | "Comprehension" | "Sight Words" | "Story" | "Mixed";
+  tags?: string[];
+  subject?: string;
+}
+
+interface GetAllReadingPassages {
+  limit?: number;
+  page?: number;
+  grade_level?: string | string[];
+  lesson_type?: string | string[];
+  subject?: string | string[];
+}
+
+// Client & Utility Types (keep as is)
+interface BuildClient {
+  key?: string;
+  sessionToken?: string;
 }
 
 interface SearchParams {
@@ -70,11 +65,12 @@ interface SavedMessage {
   content: string;
 }
 
-interface CompanionComponentProps {
-  companionId: string;
-  subject: string;
-  topic: string;
-  name: string;
+// Reading Session Component Props (NEW - replaces CompanionComponentProps)
+interface ReadingSessionComponentProps {
+  passageId: string;
+  subject: string | null;
+  topic: string; // We'll derive this from title or content
+  title: string;
   userName: string;
   userImage: string;
   voice: string;

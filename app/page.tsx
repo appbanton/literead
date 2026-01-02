@@ -1,39 +1,40 @@
-import CompanionCard from "@/components/CompanionCard";
-import CompanionsList from "@/components/CompanionsList";
+import PassageCard from "@/components/PassageCard";
+import PassagesList from "@/components/PassagesList";
 import CTA from "@/components/CTA";
-import {recentSessions} from "@/constants";
-import {getAllCompanions, getRecentSessions} from "@/lib/actions/companion.actions";
-import {getSubjectColor} from "@/lib/utils";
+import {
+  getAllReadingPassages,
+  getRecentSessions,
+} from "@/lib/actions/passage.actions";
+import { getSubjectColor } from "@/lib/utils";
 
 const Page = async () => {
-    const companions = await getAllCompanions({ limit: 3 });
-    const recentSessionsCompanions = await getRecentSessions(10);
+  const passages = await getAllReadingPassages({ limit: 3 });
+  const recentSessionsPassages = await getRecentSessions(10);
 
   return (
     <main>
-      <h1>Popular Companions</h1>
+      <h1>Popular Reading Lessons</h1>
 
-        <section className="home-section">
-            {companions.map((companion) => (
-                <CompanionCard
-                    key={companion.id}
-                    {...companion}
-                    color={getSubjectColor(companion.subject)}
-                />
-            ))}
+      <section className="home-section">
+        {passages.map((passage) => (
+          <PassageCard
+            key={passage.id}
+            {...passage}
+            color={getSubjectColor(passage.subject || "Fiction")}
+          />
+        ))}
+      </section>
 
-        </section>
-
-        <section className="home-section">
-            <CompanionsList
-                title="Recently completed sessions"
-                companions={recentSessionsCompanions}
-                classNames="w-2/3 max-lg:w-full"
-            />
-            <CTA />
-        </section>
+      <section className="home-section">
+        <PassagesList
+          title="Recently Completed Sessions"
+          passages={recentSessionsPassages}
+          classNames="w-2/3 max-lg:w-full"
+        />
+        <CTA />
+      </section>
     </main>
-  )
-}
+  );
+};
 
-export default Page
+export default Page;
