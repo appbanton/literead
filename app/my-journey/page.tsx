@@ -7,21 +7,21 @@ import {
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import {
-  getUserCompanions,
+  getUserPassages,
   getUserSessions,
-  getBookmarkedCompanions,
+  getBookmarkedPassages,
 } from "@/lib/actions/passage.actions";
 import Image from "next/image";
-import CompanionsList from "@/components/CompanionsList";
+import PassagesList from "@/components/PassagesList";
 
 const Profile = async () => {
   const user = await currentUser();
 
   if (!user) redirect("/sign-in");
 
-  const companions = await getUserCompanions(user.id);
+  const passages = await getUserPassages(user.id);
   const sessionHistory = await getUserSessions(user.id);
-  const bookmarkedCompanions = await getBookmarkedCompanions(user.id);
+  const bookmarkedPassages = await getBookmarkedPassages(user.id);
 
   return (
     <main className="min-lg:w-3/4">
@@ -58,21 +58,21 @@ const Profile = async () => {
           <div className="border border-black rouded-lg p-3 gap-2 flex flex-col h-fit">
             <div className="flex gap-2 items-center">
               <Image src="/icons/cap.svg" alt="cap" width={22} height={22} />
-              <p className="text-2xl font-bold">{companions.length}</p>
+              <p className="text-2xl font-bold">{passages.length}</p>
             </div>
-            <div>Companions created</div>
+            <div>Passages created</div>
           </div>
         </div>
       </section>
       <Accordion type="multiple">
         <AccordionItem value="bookmarks">
           <AccordionTrigger className="text-2xl font-bold">
-            Bookmarked Companions {`(${bookmarkedCompanions.length})`}
+            Bookmarked Passages {`(${bookmarkedPassages.length})`}
           </AccordionTrigger>
           <AccordionContent>
-            <CompanionsList
-              companions={bookmarkedCompanions}
-              title="Bookmarked Companions"
+            <PassagesList
+              passages={bookmarkedPassages}
+              title="Bookmarked Passages"
             />
           </AccordionContent>
         </AccordionItem>
@@ -81,22 +81,20 @@ const Profile = async () => {
             Recent Sessions
           </AccordionTrigger>
           <AccordionContent>
-            <CompanionsList
-              title="Recent Sessions"
-              companions={sessionHistory}
-            />
+            <PassagesList title="Recent Sessions" passages={sessionHistory} />
           </AccordionContent>
         </AccordionItem>
-        <AccordionItem value="companions">
+        <AccordionItem value="passages">
           <AccordionTrigger className="text-2xl font-bold">
-            My Companions {`(${companions.length})`}
+            My Passages {`(${passages.length})`}
           </AccordionTrigger>
           <AccordionContent>
-            <CompanionsList title="My Companions" companions={companions} />
+            <PassagesList title="My Passages" passages={passages} />
           </AccordionContent>
         </AccordionItem>
       </Accordion>
     </main>
   );
 };
+
 export default Profile;
