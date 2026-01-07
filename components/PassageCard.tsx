@@ -22,7 +22,6 @@ const PassageCard = ({
   subject,
   grade_level,
   estimated_duration_minutes,
-  color,
   bookmarked = false,
 }: PassageCardProps) => {
   const pathname = usePathname();
@@ -36,36 +35,45 @@ const PassageCard = ({
   };
 
   return (
-    <article className="companion-card" style={{ backgroundColor: color }}>
-      <div className="flex justify-between items-center">
-        <div className="subject-badge">{subject || "Reading"}</div>
-        <button className="companion-bookmark" onClick={handleBookmark}>
+    <article className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+      {/* Header */}
+      <div className="flex justify-between items-start mb-4">
+        <span className="px-3 py-1 bg-gray-900 text-white text-sm rounded-full font-medium">
+          {subject || "Fiction"}
+        </span>
+        <button
+          className="p-1 hover:bg-gray-100 rounded transition-colors"
+          onClick={handleBookmark}
+          aria-label={bookmarked ? "Remove bookmark" : "Add bookmark"}
+        >
           <Image
             src={
               bookmarked ? "/icons/bookmark-filled.svg" : "/icons/bookmark.svg"
             }
             alt="bookmark"
-            width={12.5}
-            height={15}
+            width={20}
+            height={20}
           />
         </button>
       </div>
 
-      <h2 className="text-2xl font-bold">{title}</h2>
-      <p className="text-sm">Grade: {grade_level}</p>
+      {/* Title */}
+      <h2 className="text-xl font-bold mb-3 line-clamp-2">{title}</h2>
 
-      <div className="flex items-center gap-2">
-        <Image
-          src="/icons/clock.svg"
-          alt="duration"
-          width={13.5}
-          height={13.5}
-        />
-        <p className="text-sm">{estimated_duration_minutes} minutes</p>
+      {/* Grade */}
+      <p className="text-sm text-gray-600 mb-3">Grade: {grade_level}</p>
+
+      {/* Duration */}
+      <div className="flex items-center gap-2 mb-4">
+        <Image src="/icons/clock.svg" alt="duration" width={16} height={16} />
+        <p className="text-sm text-gray-600">
+          {estimated_duration_minutes} minutes
+        </p>
       </div>
 
-      <Link href={`/passages/${id}`} className="w-full">
-        <button className="btn-primary w-full justify-center">
+      {/* CTA Button */}
+      <Link href={`/passages/${id}`} className="block w-full">
+        <button className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors cursor-pointer">
           Start Reading
         </button>
       </Link>
