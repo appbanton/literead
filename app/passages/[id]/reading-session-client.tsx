@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import DiscussionCompleteModal from "@/components/DiscussionCompleteModal";
+import PaywallModal from "@/components/PaywallModal";
+import { decrementSession } from "@/lib/actions/subscription.actions";
 
 interface ReadingSessionClientProps {
   passage: {
@@ -16,17 +18,20 @@ interface ReadingSessionClientProps {
   };
   sessionsRemaining: number;
   totalSessions: number;
+  hasSubscription: boolean;
 }
 
 export default function ReadingSessionClient({
   passage,
   sessionsRemaining,
   totalSessions,
+  hasSubscription,
 }: ReadingSessionClientProps) {
   const router = useRouter();
   const [hasFinishedReading, setHasFinishedReading] = useState(false);
   const [isDiscussing, setIsDiscussing] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   // Calculate minimum reading time based on word count (average 200 words/min)
   const wordCount = passage.content.split(" ").length;
@@ -54,12 +59,25 @@ export default function ReadingSessionClient({
   };
 
   const handleStartDiscussion = () => {
+    // Check if user has sessions remaining
+    if (!hasSubscription || sessionsRemaining <= 0) {
+      setShowPaywall(true);
+      return;
+    }
+
     setIsDiscussing(true);
 
     // TODO: Initialize Vapi discussion here (Phase 4)
     // For now, simulate 5-minute discussion ending
-    setTimeout(() => {
+    setTimeout(async () => {
       setIsDiscussing(false);
+
+      // Decrement session count after discussion completes
+      const success = await decrementSession();
+      if (!success) {
+        console.error("Failed to decrement session");
+      }
+
       setShowCompleteModal(true);
     }, 3000); // 3 seconds for demo (will be 5 minutes in production)
   };
@@ -159,6 +177,9 @@ export default function ReadingSessionClient({
       {showCompleteModal && (
         <DiscussionCompleteModal onReturnToLibrary={handleReturnToLibrary} />
       )}
+
+      {/* Paywall Modal */}
+      {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} />}
     </main>
   );
 }

@@ -1,4 +1,5 @@
 import { getAllReadingPassages } from "@/lib/actions/passage.actions";
+import { getUserSubscription } from "@/lib/actions/subscription.actions";
 import PassageCard from "@/components/PassageCard";
 import { getSubjectColor } from "@/lib/utils";
 import SearchInput from "@/components/SearchInput";
@@ -13,9 +14,10 @@ const PassagesLibrary = async ({ searchParams }: SearchParams) => {
 
   const passages = await getAllReadingPassages({ subject, grade_level });
 
-  // TODO: Get actual user session data from subscription
-  const sessionsRemaining = 12;
-  const totalSessions = 20;
+  // Get real subscription data from Supabase
+  const subscription = await getUserSubscription();
+  const sessionsRemaining = subscription?.sessions_remaining || 0;
+  const totalSessions = subscription?.total_sessions || 0;
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -29,12 +31,20 @@ const PassagesLibrary = async ({ searchParams }: SearchParams) => {
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
-              <span className="text-sm text-gray-600">Sessions: </span>
-              <span className="font-bold text-primary">
-                {sessionsRemaining}/{totalSessions}
-              </span>
-            </div>
+            {subscription ? (
+              <div className="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+                <span className="text-sm text-gray-600">Sessions: </span>
+                <span className="font-bold text-primary">
+                  {sessionsRemaining}/{totalSessions}
+                </span>
+              </div>
+            ) : (
+              <div className="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
+                <span className="text-sm text-gray-600">
+                  No active subscription
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

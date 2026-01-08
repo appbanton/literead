@@ -1,4 +1,5 @@
 import { getReadingPassage } from "@/lib/actions/passage.actions";
+import { getUserSubscription } from "@/lib/actions/subscription.actions";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import ReadingSessionClient from "./reading-session-client";
@@ -17,11 +18,11 @@ export default async function ReadingSessionPage({
   if (!user) redirect("/sign-in");
   if (!passage) redirect("/passages");
 
-  // TODO: Get actual subscription data from Clerk metadata or Supabase
-  // This will be implemented in Phase 2 (Paywall & Subscriptions)
-  // For now using mock data - subscription system doesn't exist yet
-  const sessionsRemaining = 12;
-  const totalSessions = 20;
+  const subscription = await getUserSubscription();
+
+  const sessionsRemaining = subscription?.sessions_remaining || 0;
+  const totalSessions = subscription?.total_sessions || 0;
+  const hasSubscription = !!subscription;
 
   return (
     <ReadingSessionClient
@@ -35,6 +36,7 @@ export default async function ReadingSessionPage({
       }}
       sessionsRemaining={sessionsRemaining}
       totalSessions={totalSessions}
+      hasSubscription={hasSubscription}
     />
   );
 }
