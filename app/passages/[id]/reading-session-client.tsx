@@ -70,7 +70,7 @@ export default function ReadingSessionClient({
     // TODO: Initialize Vapi discussion here (Phase 4)
     // For now, simulate 5-minute discussion ending
     setTimeout(async () => {
-      setIsDiscussing(false);
+      // DON'T set isDiscussing to false yet - keeps button disabled
 
       // Decrement session count after discussion completes
       const success = await decrementSession();
@@ -78,7 +78,11 @@ export default function ReadingSessionClient({
         console.error("Failed to decrement session");
       }
 
+      // Show modal first
       setShowCompleteModal(true);
+
+      // Now it's safe to reset isDiscussing
+      setIsDiscussing(false);
     }, 3000); // 3 seconds for demo (will be 5 minutes in production)
   };
 
@@ -158,9 +162,11 @@ export default function ReadingSessionClient({
             {/* Start Discussion Button */}
             <button
               onClick={handleStartDiscussion}
-              disabled={!hasFinishedReading || isDiscussing}
+              disabled={
+                !hasFinishedReading || isDiscussing || showCompleteModal
+              }
               className={`w-full py-4 rounded-lg font-semibold text-lg transition-colors ${
-                hasFinishedReading && !isDiscussing
+                hasFinishedReading && !isDiscussing && !showCompleteModal
                   ? "bg-primary text-white hover:bg-opacity-90 cursor-pointer"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}

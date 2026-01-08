@@ -1,6 +1,9 @@
 "use server";
 
-import { createSupabaseClient } from "@/lib/supabase";
+import {
+  createSupabaseClient,
+  createSupabaseServerClient,
+} from "@/lib/supabase";
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import type {
@@ -42,7 +45,7 @@ export async function getUserSubscription(): Promise<UserSubscription | null> {
 export async function createSubscription(
   params: CreateSubscriptionParams
 ): Promise<UserSubscription | null> {
-  const supabase = createSupabaseClient();
+  const supabase = createSupabaseServerClient();
 
   const { user_id, plan_tier, clerk_subscription_id } = params;
   const total_sessions = PLAN_CONFIG[plan_tier].sessions;
@@ -82,7 +85,7 @@ export async function updateSubscription(
   userId: string,
   updates: UpdateSubscriptionParams
 ): Promise<boolean> {
-  const supabase = createSupabaseClient();
+  const supabase = createSupabaseServerClient();
 
   // If plan tier is changing, update total_sessions too
   if (updates.plan_tier) {
@@ -126,10 +129,14 @@ export async function hasSessionsRemaining(): Promise<boolean> {
  * Called after completing a reading discussion
  */
 export async function decrementSession(): Promise<boolean> {
+  console.log("🔵 decrementSession called");
+
   const user = await currentUser();
+  console.log("👤 User:", user?.id);
   if (!user) return false;
 
   const subscription = await getUserSubscription();
+  console.log("📋 Subscription:", subscription);
   if (!subscription) return false;
 
   if (subscription.sessions_remaining <= 0) {
@@ -137,7 +144,10 @@ export async function decrementSession(): Promise<boolean> {
     return false;
   }
 
-  const supabase = createSupabaseClient();
+  console.log("🔢 Current sessions:", subscription.sessions_remaining);
+
+  // Use service role client to bypass RLS
+  const supabase = createSupabaseServerClient();
 
   const { error } = await supabase
     .from("user_subscriptions")
@@ -145,10 +155,11 @@ export async function decrementSession(): Promise<boolean> {
     .eq("user_id", user.id);
 
   if (error) {
-    console.error("Error decrementing session:", error);
+    console.error("❌ Error decrementing session:", error);
     return false;
   }
 
+  console.log("✅ Session decremented successfully");
   revalidatePath("/passages");
   revalidatePath("/my-journey");
   return true;
@@ -159,7 +170,7 @@ export async function decrementSession(): Promise<boolean> {
  * Called by webhook or cron job on reset_date
  */
 export async function resetMonthlySessions(userId: string): Promise<boolean> {
-  const supabase = createSupabaseClient();
+  const supabase = createSupabaseServerClient();
 
   // Get current subscription
   const { data: subscription, error: fetchError } = await supabase
@@ -207,7 +218,7 @@ export async function cancelSubscription(userId: string): Promise<boolean> {
  * Called by cron job to find subscriptions past their reset_date
  */
 export async function getSubscriptionsToReset(): Promise<UserSubscription[]> {
-  const supabase = createSupabaseClient();
+  const supabase = createSupabaseServerClient();
 
   const now = new Date().toISOString();
 
