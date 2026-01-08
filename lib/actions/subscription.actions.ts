@@ -19,7 +19,7 @@ export async function getUserSubscription(): Promise<UserSubscription | null> {
   const user = await currentUser();
   if (!user) return null;
 
-  const supabase = await createSupabaseClient();
+  const supabase = createSupabaseClient();
 
   const { data, error } = await supabase
     .from("user_subscriptions")
@@ -42,7 +42,7 @@ export async function getUserSubscription(): Promise<UserSubscription | null> {
 export async function createSubscription(
   params: CreateSubscriptionParams
 ): Promise<UserSubscription | null> {
-  const supabase = await createSupabaseClient();
+  const supabase = createSupabaseClient();
 
   const { user_id, plan_tier, clerk_subscription_id } = params;
   const total_sessions = PLAN_CONFIG[plan_tier].sessions;
@@ -82,7 +82,7 @@ export async function updateSubscription(
   userId: string,
   updates: UpdateSubscriptionParams
 ): Promise<boolean> {
-  const supabase = await createSupabaseClient();
+  const supabase = createSupabaseClient();
 
   // If plan tier is changing, update total_sessions too
   if (updates.plan_tier) {
@@ -137,7 +137,7 @@ export async function decrementSession(): Promise<boolean> {
     return false;
   }
 
-  const supabase = await createSupabaseClient();
+  const supabase = createSupabaseClient();
 
   const { error } = await supabase
     .from("user_subscriptions")
@@ -159,7 +159,7 @@ export async function decrementSession(): Promise<boolean> {
  * Called by webhook or cron job on reset_date
  */
 export async function resetMonthlySessions(userId: string): Promise<boolean> {
-  const supabase = await createSupabaseClient();
+  const supabase = createSupabaseClient();
 
   // Get current subscription
   const { data: subscription, error: fetchError } = await supabase
@@ -207,7 +207,7 @@ export async function cancelSubscription(userId: string): Promise<boolean> {
  * Called by cron job to find subscriptions past their reset_date
  */
 export async function getSubscriptionsToReset(): Promise<UserSubscription[]> {
-  const supabase = await createSupabaseClient();
+  const supabase = createSupabaseClient();
 
   const now = new Date().toISOString();
 
