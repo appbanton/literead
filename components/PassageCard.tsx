@@ -35,7 +35,7 @@ const PassageCard = ({
   };
 
   return (
-    <article className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+    <article className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow flex flex-col">
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
         <span className="px-3 py-1 bg-gray-900 text-white text-sm rounded-full font-medium">
@@ -57,8 +57,10 @@ const PassageCard = ({
         </button>
       </div>
 
-      {/* Title */}
-      <h2 className="text-xl font-bold mb-3 line-clamp-2">{title}</h2>
+      {/* Title - Single line with ellipsis */}
+      <div className="h-7 mb-3">
+        <h2 className="text-xl font-bold line-clamp-1">{title}</h2>
+      </div>
 
       {/* Grade */}
       <p className="text-sm text-gray-600 mb-3">Grade: {grade_level}</p>
@@ -71,8 +73,8 @@ const PassageCard = ({
         </p>
       </div>
 
-      {/* CTA Button */}
-      <Link href={`/passages/${id}`} className="block w-full">
+      {/* CTA Button - Push to bottom */}
+      <Link href={`/passages/${id}`} className="block w-full mt-auto">
         <button className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors cursor-pointer">
           Start Reading
         </button>

@@ -22,12 +22,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${bricolage.variable} antialiased`}>
+    <html lang="en" className="h-full">
+      <body
+        className={`${bricolage.variable} antialiased h-full flex flex-col`}
+      >
         <ClerkProvider appearance={{ variables: { colorPrimary: "#fe5933" } }}>
           <AuthRedirect />
           <Navbar />
-          {children}
+          <div className="flex-grow">{children}</div>
           <Footer />
         </ClerkProvider>
       </body>

@@ -20,7 +20,7 @@ export const createReadingPassage = async (formData: CreateReadingPassage) => {
 };
 
 export const getAllReadingPassages = async ({
-  limit = 10,
+  limit = 100,
   page = 1,
   grade_level,
   lesson_type,
@@ -48,9 +48,9 @@ export const getAllReadingPassages = async ({
     }
   }
 
-  // Filter by subject (search in title, subject, or tags)
+  // Filter by subject
   if (subject) {
-    query = query.or(`subject.ilike.%${subject}%,title.ilike.%${subject}%`);
+    query = query.eq("subject", subject);
   }
 
   // Pagination
@@ -90,9 +90,6 @@ export const addToSessionHistory = async (passageId: string) => {
   return data;
 };
 
-// ============================================
-// FIXED: getRecentSessions with proper TypeScript types
-// ============================================
 export const getRecentSessions = async (
   limit = 10
 ): Promise<ReadingPassage[]> => {
@@ -106,7 +103,6 @@ export const getRecentSessions = async (
 
   if (error) throw new Error(error.message);
 
-  // Use 'unknown' intermediate cast to satisfy TypeScript
   type SessionWithPassage = {
     reading_passages: ReadingPassage;
   };
@@ -116,9 +112,6 @@ export const getRecentSessions = async (
     .filter((passage): passage is ReadingPassage => passage !== null);
 };
 
-// ============================================
-// FIXED: getUserSessions with proper TypeScript types
-// ============================================
 export const getUserSessions = async (
   userId: string,
   limit = 10
@@ -224,9 +217,6 @@ export const removeBookmark = async (passageId: string, path: string) => {
   return data;
 };
 
-// ============================================
-// FIXED: getBookmarkedPassages with proper TypeScript types
-// ============================================
 export const getBookmarkedPassages = async (
   userId: string
 ): Promise<ReadingPassage[]> => {
@@ -248,4 +238,28 @@ export const getBookmarkedPassages = async (
   return ((data ?? []) as unknown as BookmarkWithPassage[])
     .map(({ reading_passages }) => reading_passages)
     .filter((passage): passage is ReadingPassage => passage !== null);
+};
+
+export const getAvailableSubjectsForGrade = async (
+  gradeLevel: string
+): Promise<string[]> => {
+  const supabase = createSupabaseClient();
+
+  const { data, error } = await supabase
+    .from("reading_passages")
+    .select("subject")
+    .eq("grade_level", gradeLevel)
+    .not("subject", "is", null);
+
+  if (error) {
+    console.error("Error fetching available subjects:", error);
+    return [];
+  }
+
+  // Get unique subjects and filter out nulls
+  const uniqueSubjects = [
+    ...new Set(data.map((p) => p.subject).filter((s): s is string => !!s)),
+  ];
+
+  return uniqueSubjects.sort();
 };

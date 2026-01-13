@@ -6,9 +6,9 @@ import { getUserProgress } from "@/lib/actions/user.actions";
 
 /**
  * Server component that checks if authenticated user has completed onboarding
- * Use this in layouts or pages that require onboarding
+ * Use this in PAGES that require onboarding (NOT in root layout)
  *
- * Usage in layout/page:
+ * Usage in pages like app/passages/page.tsx:
  * await requireOnboarding();
  */
 export async function requireOnboarding() {

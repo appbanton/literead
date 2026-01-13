@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 
 /**
  * Get user's progress record
- * Returns null if doesn't exist
+ * Returns null if doesn't exist (DOES NOT THROW ERROR)
  */
 export async function getUserProgress() {
   const user = await currentUser();
@@ -14,11 +14,12 @@ export async function getUserProgress() {
 
   const supabase = createSupabaseServerClient();
 
+  // Use .maybeSingle() instead of .single() to avoid throwing error
   const { data, error } = await supabase
     .from("user_progress")
     .select("*")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle(); // Returns null if no row, doesn't throw error
 
   if (error) {
     console.error("Error fetching user progress:", error);
@@ -43,7 +44,7 @@ export async function createUserProgress(gradeLevel: string): Promise<boolean> {
     .from("user_progress")
     .select("id")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   if (existing) {
     // User already has progress record, just update grade
