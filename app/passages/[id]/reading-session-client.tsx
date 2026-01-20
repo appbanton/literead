@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import DiscussionCompleteModal from "@/components/DiscussionCompleteModal";
 import PaywallModal from "@/components/PaywallModal";
+import ReadingSessionComponent from "@/components/ReadingSessionComponent";
 import { decrementSession } from "@/lib/actions/subscription.actions";
+import { markPassageComplete } from "@/lib/actions/completed.actions";
+import { useUser } from "@clerk/nextjs";
 
 interface ReadingSessionClientProps {
   passage: {
@@ -28,6 +31,7 @@ export default function ReadingSessionClient({
   hasSubscription,
 }: ReadingSessionClientProps) {
   const router = useRouter();
+  const { user } = useUser();
   const [hasFinishedReading, setHasFinishedReading] = useState(false);
   const [isDiscussing, setIsDiscussing] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
@@ -39,14 +43,14 @@ export default function ReadingSessionClient({
   const [readingTimeElapsed, setReadingTimeElapsed] = useState(0);
 
   useEffect(() => {
-    if (hasFinishedReading) return;
+    if (hasFinishedReading || isDiscussing) return;
 
     const timer = setInterval(() => {
       setReadingTimeElapsed((prev) => prev + 1);
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [hasFinishedReading]);
+  }, [hasFinishedReading, isDiscussing]);
 
   const handleCheckboxChange = () => {
     if (readingTimeElapsed >= minReadingTimeSeconds) {
@@ -58,41 +62,143 @@ export default function ReadingSessionClient({
     }
   };
 
-  const handleStartDiscussion = () => {
+  const handleStartDiscussion = async () => {
     // Check if user has sessions remaining
     if (!hasSubscription || sessionsRemaining <= 0) {
       setShowPaywall(true);
       return;
     }
 
+    // Check if Vapi token exists
+    if (!process.env.NEXT_PUBLIC_VAPI_WEB_TOKEN) {
+      alert(
+        "Voice AI is not configured. Please add VAPI token to environment variables."
+      );
+      return;
+    }
+
+    // Show voice UI and it will auto-start
     setIsDiscussing(true);
+  };
 
-    // TODO: Initialize Vapi discussion here (Phase 4)
-    // For now, simulate 5-minute discussion ending
-    setTimeout(async () => {
-      // DON'T set isDiscussing to false yet - keeps button disabled
+  const handleCancelSession = () => {
+    // User canceled before completing - no session consumed
+    setIsDiscussing(false);
+  };
 
-      // Decrement session count after discussion completes
-      const success = await decrementSession();
-      if (!success) {
-        console.error("Failed to decrement session");
+  const handleDiscussionComplete = async (
+    transcript: SavedMessage[],
+    durationSeconds: number
+  ) => {
+    // Mark passage as completed first
+    let completedPassageId: string | undefined;
+    try {
+      await markPassageComplete(passage.id, "/passages");
+      console.log("✅ Passage marked as completed");
+    } catch (error) {
+      console.error("Failed to mark passage as complete:", error);
+    }
+
+    // Save the transcript (filter out system messages if any)
+    try {
+      const { saveTranscript } = await import(
+        "@/lib/actions/transcript.actions"
+      );
+
+      // Map to only user and assistant messages with explicit type
+      const transcriptToSave: Array<{
+        role: "user" | "assistant";
+        content: string;
+        timestamp?: string;
+      }> = transcript
+        .filter((msg) => msg.role === "user" || msg.role === "assistant")
+        .map((msg) => ({
+          role: msg.role as "user" | "assistant",
+          content: msg.content,
+        }));
+
+      const result = await saveTranscript(
+        passage.id,
+        transcriptToSave,
+        durationSeconds,
+        completedPassageId
+      );
+
+      if (result.success) {
+        console.log("✅ Transcript saved successfully");
+      } else {
+        console.error("Failed to save transcript:", result.error);
       }
+    } catch (error) {
+      console.error("Error saving transcript:", error);
+    }
 
-      // Show modal first
-      setShowCompleteModal(true);
+    // Decrement session (only after successful completion)
+    const success = await decrementSession();
+    if (!success) {
+      console.error("Failed to decrement session");
+    }
 
-      // Now it's safe to reset isDiscussing
-      setIsDiscussing(false);
-    }, 3000); // 3 seconds for demo (will be 5 minutes in production)
+    // Show completion modal
+    setShowCompleteModal(true);
+    setIsDiscussing(false);
   };
 
   const handleReturnToLibrary = () => {
     router.push("/passages");
   };
 
+  // Show Vapi session if discussing
+  if (isDiscussing) {
+    return (
+      <main className="min-h-screen bg-gray-50 m-0 p-0">
+        {/* Top Bar */}
+        <div className="flex items-center justify-between w-full px-14 py-4 bg-white border-b border-gray-200 max-sm:px-4">
+          <button
+            onClick={handleCancelSession}
+            className="flex items-center gap-2 text-gray-700 hover:text-primary transition-colors"
+          >
+            <ArrowLeft size={20} />
+            <span>Cancel Session</span>
+          </button>
+          <div className="text-sm text-gray-600">
+            Sessions Remaining:{" "}
+            <span className="font-bold text-primary">
+              {sessionsRemaining}/{totalSessions}
+            </span>
+          </div>
+        </div>
+
+        {/* Vapi Voice Session */}
+        <div className="container mx-auto px-6 py-8">
+          <ReadingSessionComponent
+            passageId={passage.id}
+            subject={passage.subject}
+            topic={passage.title}
+            title="Reading Coach"
+            userName={user?.firstName || "Student"}
+            userImage={user?.imageUrl || "/icons/avatar.svg"}
+            voice="sarah"
+            style="friendly"
+            passageContent={passage.content}
+            passageTitle={passage.title}
+            gradeLevel={passage.grade_level}
+            onSessionComplete={handleDiscussionComplete}
+          />
+        </div>
+
+        {/* Discussion Complete Modal */}
+        {showCompleteModal && (
+          <DiscussionCompleteModal onReturnToLibrary={handleReturnToLibrary} />
+        )}
+      </main>
+    );
+  }
+
+  // Show reading interface
   return (
     <main className="min-h-screen bg-gray-50 m-0 p-0">
-      {/* Top Bar - Matches navbar padding exactly: px-14, py-4 */}
+      {/* Top Bar */}
       <div className="flex items-center justify-between w-full px-14 py-4 bg-white border-b border-gray-200 max-sm:px-4">
         <button
           onClick={() => router.push("/passages")}
@@ -162,30 +268,26 @@ export default function ReadingSessionClient({
             {/* Start Discussion Button */}
             <button
               onClick={handleStartDiscussion}
-              disabled={
-                !hasFinishedReading || isDiscussing || showCompleteModal
-              }
+              disabled={!hasFinishedReading || showCompleteModal}
               className={`w-full py-4 rounded-lg font-semibold text-lg transition-colors ${
-                hasFinishedReading && !isDiscussing && !showCompleteModal
+                hasFinishedReading && !showCompleteModal
                   ? "bg-primary text-white hover:bg-opacity-90 cursor-pointer"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
             >
-              {isDiscussing
-                ? "Discussion in Progress..."
-                : "Start Discussion with AI Coach"}
+              Start Discussion with AI Coach
             </button>
           </div>
         </div>
       </div>
 
-      {/* Discussion Complete Modal */}
-      {showCompleteModal && (
-        <DiscussionCompleteModal onReturnToLibrary={handleReturnToLibrary} />
-      )}
-
       {/* Paywall Modal */}
-      {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} />}
+      {showPaywall && (
+        <PaywallModal
+          onClose={() => setShowPaywall(false)}
+          passageId={passage.id}
+        />
+      )}
     </main>
   );
 }

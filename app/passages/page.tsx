@@ -4,12 +4,10 @@ import {
 } from "@/lib/actions/passage.actions";
 import { getUserSubscription } from "@/lib/actions/subscription.actions";
 import { getUserProgress } from "@/lib/actions/user.actions";
+import { getCompletedPassageIds } from "@/lib/actions/completed.actions";
 import { requireOnboarding } from "@/lib/onboarding-check";
-import PassageCard from "@/components/PassageCard";
-import { getSubjectColor } from "@/lib/utils";
-import SubjectFilter from "@/components/SubjectFilter";
 import ErrorPage from "@/components/ErrorPage";
-import GradeSelector from "@/components/GradeSelector";
+import PassagesClient from "./PassagesClient";
 
 const PassagesLibrary = async ({ searchParams }: SearchParams) => {
   // Check if user has completed onboarding
@@ -34,16 +32,18 @@ const PassagesLibrary = async ({ searchParams }: SearchParams) => {
 
   const userGrade = userProgress.current_grade_level || "K";
 
-  // Get available subjects and passages in parallel
-  const [availableSubjects, passages, subscription] = await Promise.all([
-    getAvailableSubjectsForGrade(userGrade),
-    getAllReadingPassages({
-      subject,
-      grade_level: userGrade,
-      limit: 100,
-    }),
-    getUserSubscription(),
-  ]);
+  // Get available subjects, passages, subscription, and completed passages in parallel
+  const [availableSubjects, passages, subscription, completedPassageIds] =
+    await Promise.all([
+      getAvailableSubjectsForGrade(userGrade),
+      getAllReadingPassages({
+        subject,
+        grade_level: userGrade,
+        limit: 100,
+      }),
+      getUserSubscription(),
+      getCompletedPassageIds(),
+    ]);
 
   const sessionsRemaining = subscription?.sessions_remaining || 0;
   const totalSessions = subscription?.total_sessions || 0;
@@ -63,52 +63,30 @@ const PassagesLibrary = async ({ searchParams }: SearchParams) => {
           {/* Session Counter */}
           <div className="max-sm:w-full">
             {subscription ? (
-              <div className="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
-                <span className="text-sm text-gray-600">Sessions: </span>
-                <span className="font-bold text-primary">
+              <div className="px-6 py-3 bg-white border-2 border-primary rounded-lg">
+                <p className="text-sm text-gray-600 mb-1">Sessions Remaining</p>
+                <p className="text-2xl font-bold text-primary">
                   {sessionsRemaining}/{totalSessions}
-                </span>
+                </p>
               </div>
             ) : (
-              <div className="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
-                <span className="text-sm text-gray-600">
-                  No active subscription
-                </span>
+              <div className="px-6 py-3 bg-gray-100 border-2 border-gray-300 rounded-lg">
+                <p className="text-sm text-gray-600 mb-1">No Active Plan</p>
+                <p className="text-lg font-semibold text-gray-700">
+                  Subscribe to start
+                </p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Filters Row - Left-aligned with normal spacing */}
-        <div className="flex gap-4 mb-6 max-sm:flex-col">
-          <GradeSelector currentGrade={userGrade} />
-          <SubjectFilter availableSubjects={availableSubjects} />
-        </div>
-
-        {/* Passages Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {passages.map((passage) => (
-            <PassageCard
-              key={passage.id}
-              {...passage}
-              color={getSubjectColor(passage.subject || "Fiction")}
-            />
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {passages.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-gray-500 text-lg mb-4">
-              No passages found for Grade {userGrade}
-            </p>
-            <p className="text-gray-400">
-              {subject
-                ? "Try removing the subject filter"
-                : "Check back soon for new passages!"}
-            </p>
-          </div>
-        )}
+        {/* Passages Client Component - handles filtering and display */}
+        <PassagesClient
+          allPassages={passages}
+          availableSubjects={availableSubjects}
+          userGrade={userGrade}
+          completedPassageIds={completedPassageIds}
+        />
       </div>
     </main>
   );

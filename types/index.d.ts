@@ -65,14 +65,21 @@ interface SavedMessage {
   content: string;
 }
 
-// Reading Session Component Props (NEW - replaces CompanionComponentProps)
+// Reading Session Component Props (UPDATED for Vapi integration)
 interface ReadingSessionComponentProps {
   passageId: string;
   subject: string | null;
-  topic: string; // We'll derive this from title or content
+  topic: string;
   title: string;
   userName: string;
   userImage: string;
   voice: string;
   style: string;
+  passageContent: string; // NEW: Full passage text for AI
+  passageTitle: string; // NEW: Passage title for AI context
+  gradeLevel: string; // NEW: Grade level for AI difficulty
+  onSessionComplete: (
+    transcript: SavedMessage[],
+    durationSeconds: number
+  ) => void; // UPDATED: Now passes transcript and duration
 }
