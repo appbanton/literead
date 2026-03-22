@@ -2,20 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { createClient } from "@supabase/supabase-js";
 
-// Initialize Supabase with service role (bypass RLS)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Force dynamic — prevents Next.js from trying to statically analyse
+// this route at build time, which causes env vars to be undefined
+export const dynamic = "force-dynamic";
 
 // Verify Paddle webhook signature
 function verifyWebhookSignature(
   signatureHeader: string,
   body: string,
-  secret: string
+  secret: string,
 ): boolean {
   try {
-    // Paddle signature format: "ts=1234567890;h1=signature"
     const parts = signatureHeader.split(";");
     let timestamp = "";
     let signature = "";
@@ -31,18 +28,14 @@ function verifyWebhookSignature(
       return false;
     }
 
-    // Construct the signed payload: timestamp + ":" + body
     const signedPayload = `${timestamp}:${body}`;
-
-    // Create HMAC
     const hmac = crypto.createHmac("sha256", secret);
     hmac.update(signedPayload);
     const expectedSignature = hmac.digest("hex");
 
-    // Compare signatures
     return crypto.timingSafeEqual(
       Buffer.from(signature, "hex"),
-      Buffer.from(expectedSignature, "hex")
+      Buffer.from(expectedSignature, "hex"),
     );
   } catch (error) {
     console.error("Signature verification error:", error);
@@ -50,14 +43,6 @@ function verifyWebhookSignature(
   }
 }
 
-// Map Paddle price IDs to our plan tiers
-const PRICE_TO_PLAN: { [key: string]: "basic" | "core" | "pro" } = {
-  [process.env.BASIC_PRICE_ID!]: "basic",
-  [process.env.CORE_PRICE_ID!]: "core",
-  [process.env.PRO_PRICE_ID!]: "pro",
-};
-
-// Map plan tiers to session counts
 const PLAN_SESSIONS = {
   basic: 12,
   core: 20,
@@ -65,8 +50,20 @@ const PLAN_SESSIONS = {
 };
 
 export async function POST(req: NextRequest) {
+  // Initialise inside handler — env vars guaranteed available at runtime
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
+
+  // Build PRICE_TO_PLAN inside handler for same reason
+  const PRICE_TO_PLAN: { [key: string]: "basic" | "core" | "pro" } = {
+    [process.env.BASIC_PRICE_ID!]: "basic",
+    [process.env.CORE_PRICE_ID!]: "core",
+    [process.env.PRO_PRICE_ID!]: "pro",
+  };
+
   try {
-    // Get raw body for signature verification
     const body = await req.text();
     const signature = req.headers.get("paddle-signature");
 
@@ -75,11 +72,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No signature" }, { status: 401 });
     }
 
-    // Verify webhook signature
     const isValid = verifyWebhookSignature(
       signature,
       body,
-      process.env.PADDLE_WEBHOOK_SECRET!
+      process.env.PADDLE_WEBHOOK_SECRET!,
     );
 
     if (!isValid) {
@@ -87,13 +83,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
-    // Parse webhook event
     const event = JSON.parse(body);
     const eventType = event.event_type;
 
     console.log(`📥 Received Paddle webhook: ${eventType}`);
 
-    // Handle different event types
     switch (eventType) {
       case "subscription.created":
       case "subscription.activated": {
@@ -111,17 +105,14 @@ export async function POST(req: NextRequest) {
           console.error("Unknown price ID:", priceId);
           return NextResponse.json(
             { error: "Unknown price ID" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
         const totalSessions = PLAN_SESSIONS[planTier];
-
-        // Calculate reset date (1 month from now)
         const resetDate = new Date();
         resetDate.setMonth(resetDate.getMonth() + 1);
 
-        // Upsert subscription
         const { error } = await supabase.from("user_subscriptions").upsert(
           {
             user_id: clerkUserId,
@@ -133,14 +124,14 @@ export async function POST(req: NextRequest) {
             reset_date: resetDate.toISOString(),
             updated_at: new Date().toISOString(),
           },
-          { onConflict: "user_id" }
+          { onConflict: "user_id" },
         );
 
         if (error) {
           console.error("Error upserting subscription:", error);
           return NextResponse.json(
             { error: "Database error" },
-            { status: 500 }
+            { status: 500 },
           );
         }
 
@@ -163,13 +154,12 @@ export async function POST(req: NextRequest) {
           console.error("Unknown price ID:", priceId);
           return NextResponse.json(
             { error: "Unknown price ID" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
         const totalSessions = PLAN_SESSIONS[planTier];
 
-        // Update subscription (keep current sessions_remaining)
         const { error } = await supabase
           .from("user_subscriptions")
           .update({
@@ -185,7 +175,7 @@ export async function POST(req: NextRequest) {
           console.error("Error updating subscription:", error);
           return NextResponse.json(
             { error: "Database error" },
-            { status: 500 }
+            { status: 500 },
           );
         }
 
@@ -203,7 +193,6 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ error: "No user ID" }, { status: 400 });
         }
 
-        // Update subscription status
         const { error } = await supabase
           .from("user_subscriptions")
           .update({
@@ -217,7 +206,7 @@ export async function POST(req: NextRequest) {
           console.error("Error updating subscription status:", error);
           return NextResponse.json(
             { error: "Database error" },
-            { status: 500 }
+            { status: 500 },
           );
         }
 
@@ -235,7 +224,6 @@ export async function POST(req: NextRequest) {
           return NextResponse.json({ error: "No user ID" }, { status: 400 });
         }
 
-        // Update subscription status
         const { error } = await supabase
           .from("user_subscriptions")
           .update({
@@ -248,7 +236,7 @@ export async function POST(req: NextRequest) {
           console.error("Error updating subscription status:", error);
           return NextResponse.json(
             { error: "Database error" },
-            { status: 500 }
+            { status: 500 },
           );
         }
 
@@ -258,7 +246,6 @@ export async function POST(req: NextRequest) {
 
       case "transaction.completed":
       case "transaction.payment_failed": {
-        // Log transaction events for monitoring
         console.log(`💰 Transaction ${eventType}:`, event.data.id);
         break;
       }
@@ -272,7 +259,7 @@ export async function POST(req: NextRequest) {
     console.error("Webhook error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
