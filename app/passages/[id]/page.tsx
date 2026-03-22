@@ -1,4 +1,7 @@
-import { getReadingPassage } from "@/lib/actions/passage.actions";
+import {
+  getReadingPassage,
+  getAllReadingPassages,
+} from "@/lib/actions/passage.actions";
 import { getUserSubscription } from "@/lib/actions/subscription.actions";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
@@ -24,6 +27,17 @@ export default async function ReadingSessionPage({
   const totalSessions = subscription?.total_sessions || 0;
   const hasSubscription = !!subscription;
 
+  // Fetch total passages for this grade so passage number is meaningful
+  const allPassagesForGrade = await getAllReadingPassages({
+    grade_level: passage.grade_level,
+    limit: 1000,
+  });
+  const totalPassagesForGrade = allPassagesForGrade?.length || 0;
+
+  // Find this passage's position in the grade
+  const passageIndex = allPassagesForGrade?.findIndex((p) => p.id === id) ?? -1;
+  const passageNumber = passageIndex >= 0 ? passageIndex + 1 : null;
+
   return (
     <ReadingSessionClient
       passage={{
@@ -37,6 +51,8 @@ export default async function ReadingSessionPage({
       sessionsRemaining={sessionsRemaining}
       totalSessions={totalSessions}
       hasSubscription={hasSubscription}
+      passageNumber={passageNumber}
+      totalPassagesForGrade={totalPassagesForGrade}
     />
   );
 }

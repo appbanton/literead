@@ -10,16 +10,13 @@ import ErrorPage from "@/components/ErrorPage";
 import PassagesClient from "./PassagesClient";
 
 const PassagesLibrary = async ({ searchParams }: SearchParams) => {
-  // Check if user has completed onboarding
   await requireOnboarding();
 
   const filters = await searchParams;
   const subject = filters.subject ? (filters.subject as string) : "";
 
-  // Get user's grade level from user_progress
   const userProgress = await getUserProgress();
 
-  // If no user progress, show error page
   if (!userProgress) {
     return (
       <ErrorPage
@@ -32,15 +29,10 @@ const PassagesLibrary = async ({ searchParams }: SearchParams) => {
 
   const userGrade = userProgress.current_grade_level || "K";
 
-  // Get available subjects, passages, subscription, and completed passages in parallel
   const [availableSubjects, passages, subscription, completedPassageIds] =
     await Promise.all([
       getAvailableSubjectsForGrade(userGrade),
-      getAllReadingPassages({
-        subject,
-        grade_level: userGrade,
-        limit: 100,
-      }),
+      getAllReadingPassages({ subject, grade_level: userGrade, limit: 100 }),
       getUserSubscription(),
       getCompletedPassageIds(),
     ]);
@@ -49,30 +41,86 @@ const PassagesLibrary = async ({ searchParams }: SearchParams) => {
   const totalSessions = subscription?.total_sessions || 0;
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main>
       <div className="container mx-auto px-6 py-8 max-w-7xl">
-        {/* Header Section */}
+        {/* Header */}
         <div className="flex justify-between items-start mb-8 max-sm:flex-col max-sm:gap-4">
-          <div className="flex flex-col gap-4">
-            <h1 className="text-4xl font-bold">Grade {userGrade} Passages</h1>
-            <p className="text-gray-600">
+          <div className="flex flex-col gap-2">
+            <h1
+              className="font-bold"
+              style={{
+                fontSize: "clamp(1.6rem, 3vw, 2rem)",
+                letterSpacing: "-0.025em",
+                color: "#1a1a1a",
+              }}
+            >
+              Grade {userGrade} Passages
+            </h1>
+            <p style={{ fontSize: "14px", color: "#888" }}>
               Pick a passage that interests you and practice your comprehension
             </p>
           </div>
 
-          {/* Session Counter */}
-          <div className="max-sm:w-full">
+          {/* Session counter */}
+          <div className="max-sm:w-full flex-shrink-0">
             {subscription ? (
-              <div className="px-6 py-3 bg-white border-2 border-primary rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Sessions Remaining</p>
-                <p className="text-2xl font-bold text-primary">
-                  {sessionsRemaining}/{totalSessions}
+              <div
+                className="rounded-2xl"
+                style={{
+                  padding: "12px 20px",
+                  background: "white",
+                  border: "1px solid #e8e8e4",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: "10px",
+                    color: "#aaa",
+                    marginBottom: "2px",
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Sessions remaining
+                </p>
+                <p
+                  className="font-bold"
+                  style={{
+                    fontSize: "22px",
+                    color: "#fe5933",
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  {sessionsRemaining}
+                  <span
+                    style={{ fontSize: "14px", color: "#bbb", fontWeight: 400 }}
+                  >
+                    /{totalSessions}
+                  </span>
                 </p>
               </div>
             ) : (
-              <div className="px-6 py-3 bg-gray-100 border-2 border-gray-300 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">No Active Plan</p>
-                <p className="text-lg font-semibold text-gray-700">
+              <div
+                className="rounded-2xl"
+                style={{
+                  padding: "12px 20px",
+                  background: "white",
+                  border: "1px solid #e8e8e4",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: "10px",
+                    color: "#aaa",
+                    marginBottom: "2px",
+                  }}
+                >
+                  No active plan
+                </p>
+                <p
+                  className="font-semibold"
+                  style={{ fontSize: "14px", color: "#1a1a1a" }}
+                >
                   Subscribe to start
                 </p>
               </div>
@@ -80,7 +128,6 @@ const PassagesLibrary = async ({ searchParams }: SearchParams) => {
           </div>
         </div>
 
-        {/* Passages Client Component - handles filtering and display */}
         <PassagesClient
           allPassages={passages}
           availableSubjects={availableSubjects}

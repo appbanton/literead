@@ -1,17 +1,138 @@
 "use client";
 
-import { SignUpButton } from "@clerk/nextjs";
+import { SignUpButton, useAuth } from "@clerk/nextjs";
 import ProductMockup from "@/components/ProductMockup";
 
+const LandingSkeleton = () => (
+  <main className="min-h-screen">
+    <div className="container mx-auto px-6 py-8 max-w-7xl">
+      {/* Header */}
+      <div className="flex justify-between items-start mb-8">
+        <div className="flex flex-col gap-3">
+          <div className="h-8 w-48 bg-gray-200 rounded-xl animate-pulse" />
+          <div className="h-4 w-72 bg-gray-200 rounded-lg animate-pulse" />
+        </div>
+        <div className="h-16 w-36 bg-gray-200 rounded-2xl animate-pulse" />
+      </div>
+      {/* Filters */}
+      <div className="flex gap-4 mb-6">
+        <div className="h-10 w-36 bg-gray-200 rounded-xl animate-pulse" />
+        <div className="h-10 w-44 bg-gray-200 rounded-xl animate-pulse" />
+      </div>
+      {/* Cards — match PassageCard: 20px outer radius, 16px inner, 210px height */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className="animate-pulse"
+            style={{
+              borderRadius: "20px",
+              padding: "5px",
+              background: "rgba(0,0,0,0.025)",
+              border: "1px solid rgba(0,0,0,0.07)",
+            }}
+          >
+            <div
+              style={{
+                background: "#f3f2f0",
+                borderRadius: "16px",
+                height: "210px",
+                display: "flex",
+                flexDirection: "column",
+                padding: "16px 16px 12px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: "12px",
+                }}
+              >
+                <div
+                  style={{
+                    height: "22px",
+                    width: "80px",
+                    background: "#e8e6e1",
+                    borderRadius: "999px",
+                  }}
+                />
+                <div
+                  style={{
+                    height: "22px",
+                    width: "22px",
+                    background: "#e8e6e1",
+                    borderRadius: "999px",
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  height: "15px",
+                  width: "90%",
+                  background: "#e8e6e1",
+                  borderRadius: "8px",
+                  marginBottom: "8px",
+                }}
+              />
+              <div
+                style={{
+                  height: "15px",
+                  width: "60%",
+                  background: "#e8e6e1",
+                  borderRadius: "8px",
+                }}
+              />
+              <div
+                style={{
+                  display: "flex",
+                  gap: "8px",
+                  marginTop: "auto",
+                  paddingBottom: "12px",
+                }}
+              >
+                <div
+                  style={{
+                    height: "11px",
+                    width: "55px",
+                    background: "#e8e6e1",
+                    borderRadius: "6px",
+                  }}
+                />
+                <div
+                  style={{
+                    height: "11px",
+                    width: "35px",
+                    background: "#e8e6e1",
+                    borderRadius: "6px",
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  height: "36px",
+                  background: "#e0ded9",
+                  borderRadius: "999px",
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </main>
+);
+
 export default function LandingPage() {
+  const { isLoaded, isSignedIn } = useAuth();
+
+  // Block render until Clerk confirms auth state — prevents flash of landing page
+  if (!isLoaded) return null;
+  // Signed in — show skeleton while redirecting to /passages
+  if (isSignedIn) return <LandingSkeleton />;
+
   return (
     <>
-      {/*
-        globals.css applies px-14, flex, gap-8, max-w-[1400px], pt-10 to every <main>.
-        The landing page needs full-bleed sections (CTA dark block) that break out of
-        that px-14 constraint. Solution: outer <div> instead of <main>, manage own spacing.
-        The layout's <div className="flex-grow"> still wraps this correctly.
-      */}
       <div className="bg-[#F9F8F6] overflow-x-hidden">
         {/* ─── HERO ─────────────────────────────────────────────── */}
         <div className="mx-auto px-6 pt-8 pb-4 max-w-6xl">
@@ -248,7 +369,6 @@ export default function LandingPage() {
               gap: "10px",
             }}
           >
-            {/* Big card — AI Voice Coach */}
             <div
               className="rounded-2xl p-8 flex flex-col justify-between max-md:col-span-full"
               style={{
@@ -345,7 +465,6 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Card — Graded library */}
             <div
               className="bg-white rounded-2xl p-7 flex flex-col max-md:col-span-full"
               style={{
@@ -394,7 +513,6 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Card — Progress */}
             <div
               className="bg-white rounded-2xl p-7 flex flex-col max-md:col-span-full"
               style={{
@@ -436,7 +554,6 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Card — Patient */}
             <div
               className="rounded-2xl p-7 flex flex-col max-md:col-span-full"
               style={{
@@ -492,10 +609,6 @@ export default function LandingPage() {
         </div>
 
         {/* ─── CTA DARK BLOCK ───────────────────────────────────── */}
-        {/*
-          -mx-14 on desktop and -mx-2 on mobile matches the globals.css main padding
-          exactly (px-14 / max-sm:px-2), so this bleeds edge-to-edge inside the layout.
-        */}
         <div
           className="-mx-14 max-sm:-mx-2 py-24 px-6 text-center"
           style={{ background: "#1a1a1a" }}
@@ -539,18 +652,16 @@ export default function LandingPage() {
             <button
               className="inline-flex items-center gap-3 text-white font-bold rounded-full active:scale-[0.98]"
               style={{
-                background: "#fe5933",
+                background: "#2c2c2c",
                 padding: "15px 28px",
                 fontSize: "15px",
                 transition: "all 400ms cubic-bezier(0.32,0.72,0,1)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "white";
-                e.currentTarget.style.color = "#1a1a1a";
+                e.currentTarget.style.background = "#fe5933";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "#fe5933";
-                e.currentTarget.style.color = "white";
+                e.currentTarget.style.background = "#2c2c2c";
               }}
             >
               Create a free account

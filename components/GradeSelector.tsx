@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { updateUserGrade } from "@/lib/actions/user.actions";
 import { useRouter } from "next/navigation";
 import {
@@ -39,11 +39,8 @@ export default function GradeSelector({ currentGrade }: GradeSelectorProps) {
   const handleGradeChange = async (newGrade: string) => {
     startTransition(async () => {
       const success = await updateUserGrade(newGrade);
-      if (success) {
-        router.refresh();
-      } else {
-        alert("Failed to update grade. Please try again.");
-      }
+      if (success) router.refresh();
+      else alert("Failed to update grade. Please try again.");
     });
   };
 
@@ -54,7 +51,10 @@ export default function GradeSelector({ currentGrade }: GradeSelectorProps) {
         onValueChange={handleGradeChange}
         disabled={isPending}
       >
-        <SelectTrigger className="w-40 h-10 border-2 border-black rounded-lg bg-white hover:bg-gray-50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+        <SelectTrigger
+          className="w-40 h-10 bg-white rounded-xl cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{ border: "1px solid rgba(0,0,0,0.08)" }}
+        >
           <SelectValue placeholder="Select grade" />
         </SelectTrigger>
         <SelectContent>
@@ -66,8 +66,8 @@ export default function GradeSelector({ currentGrade }: GradeSelectorProps) {
         </SelectContent>
       </Select>
       {isPending && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-lg">
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+        <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-xl">
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary" />
         </div>
       )}
     </div>

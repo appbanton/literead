@@ -22,7 +22,10 @@ const SubjectFilter = ({
   return (
     <div className="relative">
       <Select onValueChange={onSubjectChange} value={selectedSubject}>
-        <SelectTrigger className="w-48 h-10 border-2 border-black rounded-lg bg-white hover:bg-gray-50 cursor-pointer capitalize">
+        <SelectTrigger
+          className="w-48 h-10 bg-white rounded-xl cursor-pointer capitalize"
+          style={{ border: "1px solid rgba(0,0,0,0.08)" }}
+        >
           <SelectValue placeholder="All Subjects" />
         </SelectTrigger>
         <SelectContent>

@@ -123,6 +123,48 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/*
+  Dark mode card design tokens — ready for dark mode implementation.
+  Apply these when adding dark mode support to PassageCard and related components.
+
+  Card surfaces:
+  --card-dark-outer-bg: rgba(0,0,0,0.04);
+  --card-dark-outer-border: rgba(255,255,255,0.07);
+  --card-dark-inner-bg: #1e1e1e;
+  --card-dark-title: #f0f0ee;
+
+  Subject pill backgrounds (dark — 15% opacity tints):
+  --subject-science-dark-bg: rgba(168,213,181,0.15);
+  --subject-science-dark-text: #7ec89a;
+  --subject-maths-dark-bg: rgba(168,197,218,0.15);
+  --subject-maths-dark-text: #7eb0cc;
+  --subject-language-dark-bg: rgba(181,213,197,0.15);
+  --subject-language-dark-text: #7ec4a8;
+  --subject-economics-dark-bg: rgba(212,184,224,0.15);
+  --subject-economics-dark-text: #c4a8e0;
+  --subject-history-dark-bg: rgba(242,196,206,0.15);
+  --subject-history-dark-text: #e8a0b0;
+  --subject-literature-dark-bg: rgba(197,216,164,0.15);
+  --subject-literature-dark-text: #a8c87a;
+  --subject-social-studies-dark-bg: rgba(242,215,182,0.15);
+  --subject-social-studies-dark-text: #d4a060;
+  --subject-coding-dark-bg: rgba(184,201,232,0.15);
+  --subject-coding-dark-text: #8aa8d8;
+  --subject-fiction-dark-bg: rgba(232,197,160,0.15);
+  --subject-fiction-dark-text: #c89870;
+
+  Meta pills (dark):
+  --meta-pill-dark-bg: rgba(255,255,255,0.07);
+  --meta-pill-dark-text: #777;
+
+  Button (dark):
+  --card-btn-dark-bg: rgba(255,255,255,0.08);
+  --card-btn-dark-border: rgba(255,255,255,0.1);
+  --card-btn-dark-text: #ccc;
+  --card-btn-dark-hover-bg: #fe5933;
+  --card-btn-dark-hover-text: white;
+*/
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

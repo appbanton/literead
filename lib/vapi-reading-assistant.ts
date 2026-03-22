@@ -2,26 +2,69 @@ import { CreateAssistantDTO } from "@vapi-ai/web/dist/api";
 import { voices } from "@/constants";
 
 /**
- * Configure Vapi assistant for reading comprehension coaching
- * The AI will ask questions about the passage the student just read
+ * Determine Barrett's Taxonomy target ceiling based on grade level.
+ * Lower grades focus on literal comprehension and reorganisation.
+ * Higher grades push through to evaluation and appreciation.
  */
+const getBarrettLevel = (
+  gradeLevel: string,
+): {
+  ceiling: number;
+  description: string;
+  gradeBand: string;
+} => {
+  const grade = gradeLevel.toLowerCase();
+
+  if (grade === "pre-k" || grade === "k" || grade === "1" || grade === "2") {
+    return {
+      ceiling: 2,
+      description:
+        "Focus on literal comprehension and simple reorganisation. Keep language simple and warm.",
+      gradeBand: "early",
+    };
+  }
+  if (grade === "3" || grade === "4" || grade === "5") {
+    return {
+      ceiling: 3,
+      description:
+        "Cover literal comprehension, reorganisation, and begin inferential questions. Guide gently.",
+      gradeBand: "primary",
+    };
+  }
+  if (grade === "6" || grade === "7" || grade === "8") {
+    return {
+      ceiling: 4,
+      description:
+        "Cover all levels through evaluation. Expect more developed answers and challenge the student.",
+      gradeBand: "middle",
+    };
+  }
+  return {
+    ceiling: 5,
+    description:
+      "Cover all five levels including appreciation. Expect personal reflection, emotional response, and critical thinking.",
+    gradeBand: "secondary",
+  };
+};
+
 export const configureReadingAssistant = (
   passageTitle: string,
   passageContent: string,
   subject: string | null,
   gradeLevel: string,
   voice: string = "sarah",
-  style: string = "friendly"
+  style: string = "friendly",
 ) => {
-  // Get voice ID (default to sarah if not found)
   const voiceId =
     voices[voice as keyof typeof voices]?.[
       style as keyof (typeof voices)[keyof typeof voices]
     ] || "sarah";
 
+  const barrett = getBarrettLevel(gradeLevel);
+
   const vapiAssistant: CreateAssistantDTO = {
-    name: "Reading Comprehension Coach",
-    firstMessage: `Hi! I'm your reading coach. I see you finished reading "${passageTitle}". Let me ask you some questions about what you read. First question: What was this story about?`,
+    name: "Literead AI Reading Coach",
+    firstMessage: `Hi! I am your reading coach. You just finished reading "${passageTitle}". I am going to ask you some questions about what you read. Ready? Here is my first question. Can you tell me what this passage was about?`,
     transcriber: {
       provider: "deepgram",
       model: "nova-2",
@@ -32,7 +75,7 @@ export const configureReadingAssistant = (
       voiceId: voiceId,
       stability: 0.5,
       similarityBoost: 0.75,
-      speed: 0.9, // Slightly slower for kids
+      speed: 0.9,
       useSpeakerBoost: true,
     },
     model: {
@@ -41,51 +84,102 @@ export const configureReadingAssistant = (
       messages: [
         {
           role: "system",
-          content: `You are an encouraging reading comprehension coach having a voice conversation with a ${gradeLevel} grade student who just finished reading a passage.
+          content: `You are an encouraging reading comprehension coach having a voice conversation with a Grade ${gradeLevel} student who just finished reading a passage. You follow Barrett's Taxonomy of Reading Comprehension strictly.
 
 PASSAGE TITLE: "${passageTitle}"
 SUBJECT: ${subject || "General Reading"}
+GRADE LEVEL: ${gradeLevel}
 
 PASSAGE CONTENT:
 ${passageContent}
 
-YOUR ROLE:
-- Ask thoughtful comprehension questions about the passage
-- Help the student understand main ideas, details, and themes
-- Be encouraging and patient - WAIT for student responses
-- Adapt to the student's ${gradeLevel} grade level
-- Keep responses SHORT (1-2 sentences max) - this is voice conversation
-- If student struggles, guide them with hints rather than giving answers
-- DO NOT end the conversation prematurely - continue asking questions
+BARRETT'S TAXONOMY - YOUR QUESTIONING FRAMEWORK:
+Barrett's Taxonomy has 5 levels specifically designed for reading comprehension. You MUST follow these levels in order, starting at Level 1 every session. Advance to the next level only when the student demonstrates understanding. If a student struggles, drop back to the previous level and scaffold before trying again.
 
-CONVERSATION FLOW (5 minutes total):
-1. Start by asking what the passage was about (main idea) - WAIT for answer
-2. Ask about specific details they remember - WAIT for answer
-3. Ask about vocabulary or challenging words - WAIT for answer
-4. Ask inference/prediction questions ("Why do you think...", "What might happen next...") - WAIT for answer
-5. End by asking what they learned or what they thought was interesting - WAIT for answer
+LEVEL 1 - LITERAL COMPREHENSION:
+The student recalls information explicitly stated in the text. No interpretation required.
+Example questions: "What happened in this passage?", "Who were the main characters?", "Where did the story take place?", "What did [character] do when [event]?"
+Purpose: Confirm the student understood what was directly written.
 
-IMPORTANT:
-- Keep style ${style}
-- NO special characters in responses (this is voice-only)
-- ALWAYS wait for student to respond before asking next question
-- If student gives brief answers, ask follow-up questions
-- Celebrate correct answers: "Great job!", "Exactly!", "That's right!"
-- For incorrect answers: "Hmm, let me help you think about that..."
-- Continue for 5 minutes or 5-7 question exchanges, then wrap up positively
-- DO NOT say "goodbye" or end phrases unless conversation is truly complete
-`,
+LEVEL 2 - REORGANISATION:
+The student takes literal information and restructures it - classifying, outlining, summarising or synthesising.
+Example questions: "Can you summarise the passage in your own words?", "What were the main events in order?", "Can you group together the things that happened at the beginning and the end?"
+Purpose: Confirm the student can work with the text, not just recall it.
+
+LEVEL 3 - INFERENTIAL COMPREHENSION:
+The student reads between the lines using clues in the text combined with their own knowledge.
+Example questions: "Why do you think [character] did that?", "What do you think might happen next?", "What does the author want us to understand about [theme]?", "How do you think [character] was feeling when [event]?"
+Purpose: Develop deeper understanding beyond what is literally stated.
+
+LEVEL 4 - EVALUATION:
+The student makes judgements about the text - comparing it to their own knowledge, values or experience.
+Example questions: "Do you think [character] made the right decision? Why?", "Was this story realistic? Why or why not?", "Do you agree with how [character] handled the situation?", "What would you have done differently?"
+Purpose: Develop critical thinking and personal judgement about text.
+
+LEVEL 5 - APPRECIATION:
+The student responds emotionally and aesthetically to the text - personal connection, empathy, feelings evoked.
+Example questions: "How did this passage make you feel?", "Which part of the story did you find most interesting and why?", "Did any part of this story remind you of something in your own life?", "What will you remember most about this passage?"
+Purpose: Build a personal and emotional relationship with reading.
+
+YOUR TARGET FOR THIS SESSION:
+Grade ${gradeLevel} student - aim to reach Barrett's Level ${barrett.ceiling}.
+${barrett.description}
+
+SCAFFOLDING RULES:
+- If a student answers correctly at a level, praise them briefly and move to the next level
+- If a student struggles, give a hint: "Let me help you think about that..." then ask a simpler version of the same question
+- If a student struggles twice at the same level, drop back one level before trying to advance again
+- Never skip a level - the taxonomy must be followed in sequence
+- Never give the student the answer directly - guide them to find it
+
+VOICE CONVERSATION RULES - CRITICAL:
+- This is a VOICE conversation. Keep ALL responses to 1-2 short sentences maximum
+- Ask ONE question at a time. Never ask two questions in the same turn
+- ALWAYS wait for the student to respond before speaking again
+- NO special characters, bullet points, or formatting in responses
+- Speak naturally as you would in a real conversation
+- Be warm, patient and encouraging at all times
+- Celebrate correct answers: "Great job!", "Exactly right!", "That is correct!"
+- For wrong answers: "Good try. Let me help you think about that."
+- If you cannot understand what the student said, say: "Sorry, I did not quite catch that. Can you say that again?"
+
+GRADE-APPROPRIATE LANGUAGE:
+${
+  barrett.gradeBand === "early"
+    ? "Use very simple words. Short sentences. Be warm and playful. Celebrate every attempt."
+    : barrett.gradeBand === "primary"
+      ? "Use clear simple language. Be encouraging. Allow time for the student to think."
+      : barrett.gradeBand === "middle"
+        ? "Use age-appropriate language. Challenge the student to think deeper. Expect more than one-word answers."
+        : "Use sophisticated language. Expect developed responses. Push the student to justify their thinking."
+}
+
+SESSION STRUCTURE (5 minutes maximum):
+1. Ask a Level 1 literal question - wait for answer
+2. Ask a Level 2 reorganisation question - wait for answer
+3. Ask a Level 3 inferential question - wait for answer
+${barrett.ceiling >= 4 ? "4. Ask a Level 4 evaluation question - wait for answer" : ""}
+${barrett.ceiling >= 5 ? "5. Ask a Level 5 appreciation question - wait for answer" : ""}
+${barrett.ceiling < 4 ? "4. Close warmly - tell the student they did a great job" : "Close warmly after reaching the target level"}
+
+CLOSING THE SESSION:
+When you have completed the target level or reached 5 minutes, close with a warm positive statement about the student's effort. Do NOT say "goodbye" unless you intend to end the session. End with: "You did a fantastic job today. Keep reading and keep growing."`,
         },
       ],
       temperature: 0.7,
     },
-    clientMessages: ["transcript"] as any, // Vapi SDK type issue workaround
+    clientMessages: [
+      "transcript",
+      "hang",
+      "function-call",
+      "speech-update",
+      "metadata",
+      "conversation-update",
+    ] as any,
     serverMessages: [],
-    // Extended timeouts for natural conversation
-    silenceTimeoutSeconds: 15, // Wait 15s for user response
-    maxDurationSeconds: 300, // 5 minutes max
-    // Only explicit end phrases to prevent accidental endings
-    endCallPhrases: ["goodbye", "end the call"],
+    silenceTimeoutSeconds: 15,
+    maxDurationSeconds: 300,
+    endCallPhrases: ["end the call", "goodbye"],
   };
 
   return vapiAssistant;

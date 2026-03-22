@@ -1,66 +1,161 @@
 export default function MyJourneyLoading() {
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-6 py-8 max-w-7xl">
-        {/* Profile Header Skeleton */}
-        <section className="flex justify-between gap-4 max-sm:flex-col items-center mb-8">
-          <div className="flex gap-4 items-center">
-            {/* Profile Image Skeleton */}
-            <div className="w-[100px] h-[100px] rounded-full bg-gray-200 animate-pulse" />
-            <div>
-              {/* Name Skeleton */}
-              <div className="h-9 w-48 bg-gray-200 rounded mb-2 animate-pulse" />
-              {/* Email Skeleton */}
-              <div className="h-5 w-64 bg-gray-200 rounded animate-pulse" />
-            </div>
-          </div>
-        </section>
-
-        {/* Stats Cards Skeleton - Match actual card styling */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {[1, 2, 3].map((i) => (
+    <main>
+      <div className="min-h-screen" style={{ background: "#F9F8F6" }}>
+        <div className="container mx-auto px-6 py-8 max-w-4xl">
+          {/* Profile */}
+          <section className="flex items-center gap-4 mb-8">
             <div
-              key={i}
-              className="bg-white border-2 border-gray-200 rounded-lg p-6 shadow-sm"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                {/* Emoji placeholder */}
-                <div className="w-10 h-10 bg-gray-200 rounded animate-pulse" />
-                {/* Number placeholder */}
-                <div className="h-10 w-16 bg-gray-200 rounded animate-pulse" />
+              className="rounded-full animate-pulse flex-shrink-0"
+              style={{ width: "60px", height: "60px", background: "#e8e6e1" }}
+            />
+            <div className="flex flex-col gap-2">
+              <div
+                className="rounded-lg animate-pulse"
+                style={{
+                  height: "20px",
+                  width: "140px",
+                  background: "#e8e6e1",
+                }}
+              />
+              <div
+                className="rounded-lg animate-pulse"
+                style={{
+                  height: "12px",
+                  width: "200px",
+                  background: "#e8e6e1",
+                }}
+              />
+            </div>
+          </section>
+
+          {/* Stats */}
+          <section className="grid grid-cols-3 gap-3 mb-5 max-sm:grid-cols-1">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="rounded-2xl animate-pulse"
+                style={{
+                  background: "white",
+                  border: "1px solid #e8e8e4",
+                  padding: "18px 20px",
+                }}
+              >
+                <div
+                  className="rounded-xl mb-3"
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    background: "#f0efed",
+                  }}
+                />
+                <div
+                  className="rounded-lg mb-2"
+                  style={{
+                    height: "28px",
+                    width: "60px",
+                    background: "#f0efed",
+                  }}
+                />
+                <div
+                  className="rounded-lg"
+                  style={{
+                    height: "10px",
+                    width: "100px",
+                    background: "#f0efed",
+                  }}
+                />
               </div>
-              {/* Label placeholder */}
-              <div className="h-5 w-36 bg-gray-200 rounded animate-pulse" />
+            ))}
+          </section>
+
+          {/* Plan card */}
+          <section className="mb-5">
+            <div
+              className="rounded-2xl animate-pulse flex items-center justify-between"
+              style={{
+                background: "white",
+                border: "1px solid #e8e8e4",
+                padding: "20px 24px",
+              }}
+            >
+              <div className="flex flex-col gap-2">
+                <div
+                  className="rounded-lg"
+                  style={{
+                    height: "10px",
+                    width: "80px",
+                    background: "#f0efed",
+                  }}
+                />
+                <div
+                  className="rounded-lg"
+                  style={{
+                    height: "18px",
+                    width: "100px",
+                    background: "#f0efed",
+                  }}
+                />
+                <div
+                  className="rounded-lg"
+                  style={{
+                    height: "12px",
+                    width: "200px",
+                    background: "#f0efed",
+                  }}
+                />
+              </div>
+              <div className="flex flex-col items-end gap-2">
+                <div
+                  className="rounded-lg"
+                  style={{
+                    height: "32px",
+                    width: "60px",
+                    background: "#f0efed",
+                  }}
+                />
+                <div
+                  className="rounded-lg"
+                  style={{
+                    height: "10px",
+                    width: "100px",
+                    background: "#f0efed",
+                  }}
+                />
+              </div>
             </div>
-          ))}
-        </section>
+          </section>
 
-        {/* Subscription Card Skeleton - Match gradient style */}
-        <section className="bg-gradient-to-r from-gray-300 to-gray-400 rounded-lg p-6 mb-8 shadow-md">
-          <div className="flex justify-between items-center max-sm:flex-col max-sm:items-start max-sm:gap-4">
-            <div className="flex-1">
-              {/* "Current Plan" label */}
-              <div className="h-3 w-24 bg-gray-400 rounded mb-2 animate-pulse opacity-60" />
-              {/* Plan name */}
-              <div className="h-7 w-32 bg-gray-400 rounded mb-3 animate-pulse" />
-              {/* Sessions info */}
-              <div className="h-4 w-72 bg-gray-400 rounded animate-pulse opacity-60" />
+          {/* Accordion */}
+          <section>
+            <div
+              className="rounded-2xl overflow-hidden animate-pulse"
+              style={{
+                background: "white",
+                border: "1px solid #e8e8e4",
+                padding: "18px 24px",
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="rounded-lg"
+                  style={{
+                    height: "14px",
+                    width: "160px",
+                    background: "#f0efed",
+                  }}
+                />
+                <div
+                  className="rounded-full"
+                  style={{
+                    height: "18px",
+                    width: "28px",
+                    background: "#f0efed",
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </section>
-
-        {/* Completed Passages Skeleton - Match accordion style */}
-        <div className="bg-white rounded-lg border-2 border-gray-200 px-6 mb-6">
-          <div className="py-4">
-            <div className="h-8 w-72 bg-gray-200 rounded animate-pulse" />
-          </div>
-        </div>
-
-        {/* Recent Activity Skeleton - Match accordion style */}
-        <div className="bg-white rounded-lg border-2 border-gray-200 px-6">
-          <div className="py-4">
-            <div className="h-8 w-64 bg-gray-200 rounded animate-pulse" />
-          </div>
+          </section>
         </div>
       </div>
     </main>

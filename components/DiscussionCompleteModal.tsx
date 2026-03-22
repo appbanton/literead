@@ -12,10 +12,8 @@ export default function DiscussionCompleteModal({
   const [doNotShowAgain, setDoNotShowAgain] = useState(false);
 
   useEffect(() => {
-    // Check if user has previously selected "do not show again"
     const preference = localStorage.getItem("hideDiscussionCompleteModal");
     if (preference === "true") {
-      // If they don't want to see it, auto-redirect
       onReturnToLibrary();
     }
   }, [onReturnToLibrary]);
@@ -28,39 +26,78 @@ export default function DiscussionCompleteModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8">
-        {/* Title */}
-        <h2 className="text-2xl font-bold mb-4 text-center">
-          Discussion Complete
-        </h2>
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50 p-4"
+      style={{ background: "rgba(0,0,0,0.45)" }}
+    >
+      <div
+        className="w-full max-w-sm rounded-2xl overflow-hidden"
+        style={{ background: "white", border: "1px solid #e8e8e4" }}
+      >
+        <div style={{ padding: "28px 28px 24px" }}>
+          {/* Title */}
+          <h2
+            className="font-bold text-center"
+            style={{
+              fontSize: "18px",
+              letterSpacing: "-0.02em",
+              color: "#1a1a1a",
+              marginBottom: "10px",
+            }}
+          >
+            Discussion Complete
+          </h2>
 
-        {/* Body Text */}
-        <p className="text-gray-700 text-center mb-6 leading-relaxed">
-          Great job! You've completed your reading comprehension discussion.
-          Keep practicing to improve your understanding.
-        </p>
+          {/* Body */}
+          <p
+            className="text-center"
+            style={{
+              fontSize: "14px",
+              color: "#888",
+              lineHeight: "1.6",
+              marginBottom: "24px",
+            }}
+          >
+            Great work! You've finished your reading comprehension discussion.
+            Keep practicing to build your understanding.
+          </p>
 
-        {/* Do Not Show Again Checkbox */}
-        <label className="flex items-center gap-3 mb-6 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={doNotShowAgain}
-            onChange={(e) => setDoNotShowAgain(e.target.checked)}
-            className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary cursor-pointer"
-          />
-          <span className="text-sm text-gray-600">
-            Do not show this message again
-          </span>
-        </label>
+          {/* Do not show again */}
+          <label
+            className="flex items-center gap-3 cursor-pointer"
+            style={{ marginBottom: "16px" }}
+          >
+            <input
+              type="checkbox"
+              checked={doNotShowAgain}
+              onChange={(e) => setDoNotShowAgain(e.target.checked)}
+              className="w-4 h-4 cursor-pointer"
+              style={{ accentColor: "#fe5933" }}
+            />
+            <span style={{ fontSize: "12px", color: "#aaa" }}>
+              Do not show this message again
+            </span>
+          </label>
 
-        {/* Return Button */}
-        <button
-          onClick={handleReturnClick}
-          className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors cursor-pointer"
-        >
-          Return to Library
-        </button>
+          {/* Button */}
+          <button
+            onClick={handleReturnClick}
+            className="w-full font-semibold transition-all duration-200 active:scale-[0.98]"
+            style={{
+              padding: "12px 0",
+              borderRadius: "10px",
+              fontSize: "14px",
+              background: "#fe5933",
+              color: "white",
+              border: "none",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#e54e2a")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#fe5933")}
+          >
+            Return to Library
+          </button>
+        </div>
       </div>
     </div>
   );

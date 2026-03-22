@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 import NavItems from "@/components/NavItems";
 
@@ -10,31 +9,23 @@ const Navbar = () => {
   const logoHref = isLoaded && isSignedIn ? "/passages" : "/";
 
   return (
-    <div className="w-full px-4 pt-5 pb-2">
+    <div className="w-full px-14 max-sm:px-2 pt-5 pb-2">
       <div
         className="mx-auto flex items-center justify-between px-5 py-3"
-        style={{ maxWidth: "1100px" }}
+        style={{ maxWidth: "1400px" }}
       >
         {/* Logo */}
         <Link href={logoHref}>
-          <div className="flex items-center gap-2 cursor-pointer">
-            <Image
-              src="/icons/lightbulb.svg"
-              alt="LITEREAD logo"
-              width={28}
-              height={28}
-            />
-            <span
-              className="font-bold max-sm:hidden"
-              style={{
-                fontSize: "16px",
-                letterSpacing: "-0.02em",
-                color: "#1a1a1a",
-              }}
-            >
-              LITEREAD
-            </span>
-          </div>
+          <span
+            className="font-bold cursor-pointer"
+            style={{
+              fontSize: "18px",
+              letterSpacing: "-0.02em",
+              color: "#1a1a1a",
+            }}
+          >
+            Literead
+          </span>
         </Link>
 
         {/* Nav + auth */}
