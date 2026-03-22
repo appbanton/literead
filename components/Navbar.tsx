@@ -7,39 +7,70 @@ import NavItems from "@/components/NavItems";
 
 const Navbar = () => {
   const { isSignedIn, isLoaded } = useAuth();
-
-  // Determine where logo should link based on auth state
   const logoHref = isLoaded && isSignedIn ? "/passages" : "/";
 
   return (
-    <nav className="navbar">
-      <Link href={logoHref}>
-        <div className="flex items-center gap-2.5 cursor-pointer">
-          <Image
-            src="/icons/lightbulb.svg"
-            alt="LITEREAD logo"
-            width={40}
-            height={40}
-          />
-          <span className="font-bold text-2xl max-sm:hidden">LITEREAD</span>
+    <div className="w-full px-4 pt-5 pb-2">
+      <div
+        className="mx-auto flex items-center justify-between px-5 py-3"
+        style={{ maxWidth: "1100px" }}
+      >
+        {/* Logo */}
+        <Link href={logoHref}>
+          <div className="flex items-center gap-2 cursor-pointer">
+            <Image
+              src="/icons/lightbulb.svg"
+              alt="LITEREAD logo"
+              width={28}
+              height={28}
+            />
+            <span
+              className="font-bold max-sm:hidden"
+              style={{
+                fontSize: "16px",
+                letterSpacing: "-0.02em",
+                color: "#1a1a1a",
+              }}
+            >
+              LITEREAD
+            </span>
+          </div>
+        </Link>
+
+        {/* Nav + auth */}
+        <div className="flex items-center gap-6">
+          <NavItems />
+          {isLoaded && (
+            <>
+              {!isSignedIn && (
+                <SignInButton mode="modal">
+                  <button
+                    className="font-semibold rounded-full transition-all duration-300 active:scale-[0.98]"
+                    style={{
+                      fontSize: "13px",
+                      padding: "8px 18px",
+                      background: "#2c2c2c",
+                      color: "white",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.background = "#fe5933")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.background = "#2c2c2c")
+                    }
+                  >
+                    Sign In
+                  </button>
+                </SignInButton>
+              )}
+              {isSignedIn && <UserButton />}
+            </>
+          )}
         </div>
-      </Link>
-      <div className="flex items-center gap-8">
-        <NavItems />
-        {isLoaded && (
-          <>
-            {!isSignedIn && (
-              <SignInButton mode="modal">
-                <button className="btn-signin hover:bg-primary hover:text-white transition-colors">
-                  Sign In
-                </button>
-              </SignInButton>
-            )}
-            {isSignedIn && <UserButton />}
-          </>
-        )}
       </div>
-    </nav>
+    </div>
   );
 };
 
