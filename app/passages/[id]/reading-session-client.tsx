@@ -13,7 +13,6 @@ import ReadingSessionComponent, {
 } from "@/components/ReadingSessionComponent";
 import { decrementSession } from "@/lib/actions/subscription.actions";
 import { markPassageComplete } from "@/lib/actions/completed.actions";
-import { useUser } from "@clerk/nextjs";
 
 const SUBJECT_STYLES: Record<string, { bg: string; text: string }> = {
   science: { bg: "#A8D5B5", text: "#1a4a2e" },
@@ -163,7 +162,6 @@ export default function ReadingSessionClient({
   totalPassagesForGrade,
 }: ReadingSessionClientProps) {
   const router = useRouter();
-  const { user } = useUser();
   const { endCall } = useVapiControls();
 
   const [hasFinishedReading, setHasFinishedReading] = useState(false);
@@ -172,7 +170,6 @@ export default function ReadingSessionClient({
   const [showPaywall, setShowPaywall] = useState(false);
   const [showPassageOverlay, setShowPassageOverlay] = useState(false);
 
-  // Voice session state — lifted from ReadingSessionComponent
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [messages, setMessages] = useState<SavedMessage[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -189,7 +186,6 @@ export default function ReadingSessionClient({
     return () => clearInterval(timer);
   }, [hasFinishedReading, isDiscussing]);
 
-  // Auto-scroll transcript to bottom on new messages
   useEffect(() => {
     transcriptBottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -332,32 +328,73 @@ export default function ReadingSessionClient({
               passageNumber={passageNumber}
               totalPassagesForGrade={totalPassagesForGrade}
             />
-            <div className="px-8 py-8 max-sm:px-4">
+
+            <div
+              className="px-8 py-8 max-sm:px-5"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "#e8e8e4 transparent",
+              }}
+            >
               <PassageContent title={passage.title} content={passage.content} />
+
+              {/* Reading confirmation */}
               <div
-                className="rounded-xl p-5 mt-8"
-                style={{ background: "#F9F8F6", border: "1px solid #e8e8e4" }}
+                className="mt-10 pt-6"
+                style={{ borderTop: "1px solid #f0f0ee" }}
               >
-                <label className="flex items-center gap-3 cursor-pointer mb-4">
-                  <input
-                    type="checkbox"
-                    checked={hasFinishedReading}
-                    onChange={handleCheckboxChange}
-                    className="w-4 h-4 cursor-pointer"
-                    style={{ accentColor: "#fe5933" }}
-                  />
+                <label
+                  className="flex items-center gap-3 cursor-pointer"
+                  style={{ userSelect: "none" }}
+                >
+                  <div
+                    onClick={handleCheckboxChange}
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      borderRadius: "6px",
+                      border: hasFinishedReading
+                        ? "2px solid #fe5933"
+                        : "2px solid #d4d2cc",
+                      background: hasFinishedReading ? "#fe5933" : "white",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    {hasFinishedReading && (
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 12 12"
+                        fill="none"
+                      >
+                        <path
+                          d="M2 6l3 3 5-5"
+                          stroke="white"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    )}
+                  </div>
                   <span style={{ fontSize: "14px", color: "#555" }}>
-                    I've finished reading this passage
+                    I have finished reading this passage
                   </span>
                 </label>
+
                 <button
                   onClick={handleStartDiscussion}
                   disabled={!hasFinishedReading || showCompleteModal}
-                  className="w-full font-semibold transition-all duration-300 active:scale-[0.98]"
+                  className="mt-4 w-full font-semibold transition-all duration-200"
                   style={{
-                    padding: "13px 0",
-                    borderRadius: "10px",
-                    fontSize: "14px",
+                    padding: "14px 0",
+                    borderRadius: "12px",
+                    fontSize: "15px",
                     background:
                       hasFinishedReading && !showCompleteModal
                         ? "#fe5933"
@@ -403,14 +440,10 @@ export default function ReadingSessionClient({
   // ─── Discussion state — split layout ───────────────────────────────────────
   return (
     <main className="min-h-screen" style={{ background: "#F9F8F6" }}>
-      {/* Headless Vapi controller */}
+      {/* Headless Vapi controller — dead props removed: topic, title, userName, userImage */}
       <ReadingSessionComponent
         passageId={passage.id}
         subject={passage.subject}
-        topic={passage.title}
-        title="Reading Coach"
-        userName={user?.firstName || "Student"}
-        userImage={user?.imageUrl || "/icons/avatar.svg"}
         voice="sarah"
         style="friendly"
         passageContent={passage.content}
@@ -493,7 +526,7 @@ export default function ReadingSessionClient({
               </div>
             </div>
 
-            {/* Desktop card header on right side */}
+            {/* Desktop conversation header */}
             <div
               className="max-sm:hidden"
               style={{ borderBottom: "1px solid #f0f0ee" }}

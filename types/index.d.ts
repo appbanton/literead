@@ -1,4 +1,4 @@
-// User types (keep as is)
+// ── User types ────────────────────────────────────────────────────────────────
 interface CreateUser {
   email: string;
   name: string;
@@ -6,7 +6,7 @@ interface CreateUser {
   accountId: string;
 }
 
-// Reading Passage Types (NEW - replaces Companion)
+// ── Reading Passage types ─────────────────────────────────────────────────────
 type ReadingPassage = {
   id: string;
   title: string;
@@ -22,7 +22,7 @@ type ReadingPassage = {
   is_public: boolean;
   created_at: string;
   updated_at: string;
-  bookmarked?: boolean; // For UI state
+  bookmarked?: boolean;
 };
 
 interface CreateReadingPassage {
@@ -43,7 +43,7 @@ interface GetAllReadingPassages {
   subject?: string | string[];
 }
 
-// Client & Utility Types (keep as is)
+// ── Client & utility types ────────────────────────────────────────────────────
 interface BuildClient {
   key?: string;
   sessionToken?: string;
@@ -65,21 +65,22 @@ interface SavedMessage {
   content: string;
 }
 
-// Reading Session Component Props (UPDATED for Vapi integration)
+// ── Reading Session Component props ───────────────────────────────────────────
+// Removed dead props from Converso template: topic, title, userName, userImage.
+// These were passed at the call site but never consumed inside ReadingSessionComponent.
 interface ReadingSessionComponentProps {
   passageId: string;
   subject: string | null;
-  topic: string;
-  title: string;
-  userName: string;
-  userImage: string;
   voice: string;
   style: string;
-  passageContent: string; // NEW: Full passage text for AI
-  passageTitle: string; // NEW: Passage title for AI context
-  gradeLevel: string; // NEW: Grade level for AI difficulty
+  passageContent: string;
+  passageTitle: string;
+  gradeLevel: string;
   onSessionComplete: (
     transcript: SavedMessage[],
-    durationSeconds: number
-  ) => void; // UPDATED: Now passes transcript and duration
+    durationSeconds: number,
+  ) => void;
+  onStatusChange?: (status: CallStatus) => void;
+  onMessagesChange?: (messages: SavedMessage[]) => void;
+  onSpeakingChange?: (isSpeaking: boolean) => void;
 }

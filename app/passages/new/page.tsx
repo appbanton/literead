@@ -19,7 +19,7 @@ const NewPassage = async () => {
           <PassageForm />
         </article>
       ) : (
-        <article className="companion-limit">
+        <article className="passage-limit">
           <Image
             src="/images/limit.svg"
             alt="Passage limit reached"
@@ -27,15 +27,12 @@ const NewPassage = async () => {
             height={230}
           />
           <div className="cta-badge">Upgrade your plan</div>
-          <h1>You've Reached Your Limit</h1>
+          <h1>You&apos;ve Reached Your Limit</h1>
           <p>
-            You've reached your custom passage limit. Upgrade to create more
-            passages and access premium features.
+            You&apos;ve reached your custom passage limit. Upgrade to create
+            more passages and access premium features.
           </p>
-          <Link
-            href="/subscription"
-            className="btn-primary w-full justify-center"
-          >
+          <Link href="/pricing" className="btn-primary w-full justify-center">
             Upgrade My Plan
           </Link>
         </article>

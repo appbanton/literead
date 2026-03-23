@@ -11,13 +11,12 @@ export enum CallStatus {
   FINISHED = "finished",
 }
 
+// Removed props from original Converso template that were never used inside
+// this component: topic, title, userName, userImage.
+// voice + style are kept — they pass through to configureReadingAssistant.
 interface ReadingSessionComponentProps {
   passageId: string;
   subject: string | null;
-  topic: string;
-  title: string;
-  userName: string;
-  userImage: string;
   voice: string;
   style: string;
   passageContent: string;
@@ -47,15 +46,15 @@ export default function ReadingSessionComponent({
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [callStartTime, setCallStartTime] = useState<number | null>(null);
 
-  // Fix stale closure bug: mirror messages in a ref so onCallEnd always reads current value
   const messagesRef = useRef<SavedMessage[]>([]);
   const callStartTimeRef = useRef<number | null>(null);
   const hasStartedCall = useRef(false);
-  // Stable callback refs — updated every render but never cause effect re-registration
+
   const onSessionCompleteRef = useRef(onSessionComplete);
   const onStatusChangeRef = useRef(onStatusChange);
   const onMessagesChangeRef = useRef(onMessagesChange);
   const onSpeakingChangeRef = useRef(onSpeakingChange);
+
   useEffect(() => {
     onSessionCompleteRef.current = onSessionComplete;
   }, [onSessionComplete]);
@@ -79,7 +78,6 @@ export default function ReadingSessionComponent({
     onMessagesChangeRef.current?.(msgs);
   };
 
-  // Auto-start on mount
   useEffect(() => {
     if (!hasStartedCall.current && callStatus === CallStatus.INACTIVE) {
       hasStartedCall.current = true;
@@ -98,7 +96,6 @@ export default function ReadingSessionComponent({
 
     const onCallEnd = async () => {
       updateStatus(CallStatus.FINISHED);
-      // Use ref — never stale, always has all messages
       const finalMessages = messagesRef.current;
       const startTime = callStartTimeRef.current;
       const callDuration = startTime ? (Date.now() - startTime) / 1000 : 0;
@@ -184,11 +181,9 @@ export default function ReadingSessionComponent({
   const handleEndCall = () => vapi.stop();
   const handleToggleMute = () => vapi.setMuted(!vapi.isMuted());
 
-  // Expose controls via imperative handle pattern — rendered by parent
   return null;
 }
 
-// Export controls so parent can call them
 export function useVapiControls() {
   const endCall = () => vapi.stop();
   const toggleMute = () => vapi.setMuted(!vapi.isMuted());

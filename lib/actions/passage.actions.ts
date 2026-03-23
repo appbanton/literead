@@ -30,7 +30,6 @@ export const getAllReadingPassages = async ({
 
   let query = supabase.from("reading_passages").select();
 
-  // Filter by grade level
   if (grade_level) {
     if (Array.isArray(grade_level)) {
       query = query.in("grade_level", grade_level);
@@ -39,7 +38,6 @@ export const getAllReadingPassages = async ({
     }
   }
 
-  // Filter by lesson type
   if (lesson_type) {
     if (Array.isArray(lesson_type)) {
       query = query.in("lesson_type", lesson_type);
@@ -48,12 +46,10 @@ export const getAllReadingPassages = async ({
     }
   }
 
-  // Filter by subject
   if (subject) {
     query = query.eq("subject", subject);
   }
 
-  // Pagination
   query = query.range((page - 1) * limit, page * limit - 1);
 
   const { data: passages, error } = await query;
@@ -91,7 +87,7 @@ export const addToSessionHistory = async (passageId: string) => {
 };
 
 export const getRecentSessions = async (
-  limit = 10
+  limit = 10,
 ): Promise<ReadingPassage[]> => {
   const supabase = createSupabaseClient();
 
@@ -114,7 +110,7 @@ export const getRecentSessions = async (
 
 export const getUserSessions = async (
   userId: string,
-  limit = 10
+  limit = 10,
 ): Promise<ReadingPassage[]> => {
   const supabase = createSupabaseClient();
 
@@ -149,35 +145,15 @@ export const getUserPassages = async (userId: string) => {
   return data;
 };
 
+// All authenticated users can create passages.
+// To gate by plan in future, import getUserSubscription and check plan_tier
+// against PLAN_CONFIG from lib/types/subscription.types.ts.
 export const newPassagePermissions = async () => {
-  const { userId, has } = await auth();
-  const supabase = createSupabaseClient();
-
-  let limit = 0;
-
-  // Pro plan gets unlimited passages
-  if (has({ plan: "pro_companion" })) {
-    return true;
-  } else if (has({ feature: "three_companion_limit" })) {
-    limit = 3;
-  } else if (has({ feature: "ten_companion_limit" })) {
-    limit = 10;
-  }
-
-  const { data, error } = await supabase
-    .from("reading_passages")
-    .select("id", { count: "exact" })
-    .eq("created_by", userId);
-
-  if (error) throw new Error(error.message);
-
-  const passageCount = data?.length || 0;
-
-  //return passageCount < limit;
   return true;
 };
 
-// Bookmarks
+// ── Bookmarks ─────────────────────────────────────────────────────────────────
+
 export const addBookmark = async (passageId: string, path: string) => {
   const { userId } = await auth();
   if (!userId) return;
@@ -218,7 +194,7 @@ export const removeBookmark = async (passageId: string, path: string) => {
 };
 
 export const getBookmarkedPassages = async (
-  userId: string
+  userId: string,
 ): Promise<ReadingPassage[]> => {
   const supabase = createSupabaseClient();
 
@@ -241,7 +217,7 @@ export const getBookmarkedPassages = async (
 };
 
 export const getAvailableSubjectsForGrade = async (
-  gradeLevel: string
+  gradeLevel: string,
 ): Promise<string[]> => {
   const supabase = createSupabaseClient();
 
@@ -256,7 +232,6 @@ export const getAvailableSubjectsForGrade = async (
     return [];
   }
 
-  // Get unique subjects and filter out nulls
   const uniqueSubjects = [
     ...new Set(data.map((p) => p.subject).filter((s): s is string => !!s)),
   ];
