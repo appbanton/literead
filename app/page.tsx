@@ -158,16 +158,19 @@ export default function LandingPage() {
                     letterSpacing: "0.18em",
                     textTransform: "uppercase",
                     color: "#fe5933",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}
                 >
-                  Built on proven reading instruction methods
+                  Built on proven reading methods
                 </span>
               </div>
 
               <h1
                 className="font-bold mb-6"
                 style={{
-                  fontSize: "clamp(2.6rem, 5vw, 4rem)",
+                  fontSize: "clamp(2rem, 3.5vw, 3.5rem)",
                   lineHeight: "1.06",
                   letterSpacing: "-0.03em",
                   color: "#1a1a1a",
@@ -271,9 +274,8 @@ export default function LandingPage() {
           </h2>
 
           <div
-            className="grid border rounded-2xl overflow-hidden max-md:grid-cols-1"
+            className="grid grid-cols-3 max-md:grid-cols-1 border rounded-2xl overflow-hidden"
             style={{
-              gridTemplateColumns: "1fr 1fr 1fr",
               borderColor: "#e8e8e4",
               gap: "1px",
               background: "#e8e8e4",
@@ -362,21 +364,12 @@ export default function LandingPage() {
           </h2>
 
           <div
-            className="grid max-md:grid-cols-1"
-            style={{
-              gridTemplateColumns: "repeat(12, 1fr)",
-              gridTemplateRows: "auto auto",
-              gap: "10px",
-            }}
+            className="grid grid-cols-12 max-md:grid-cols-1"
+            style={{ gap: "10px" }}
           >
             <div
-              className="rounded-2xl p-8 flex flex-col justify-between max-md:col-span-full"
-              style={{
-                gridColumn: "1 / 8",
-                gridRow: "1",
-                background: "#1a1a1a",
-                minHeight: "260px",
-              }}
+              className="rounded-2xl p-8 flex flex-col justify-between col-span-7 max-md:col-span-full"
+              style={{ background: "#1a1a1a", minHeight: "260px" }}
             >
               <div>
                 <div
@@ -466,12 +459,8 @@ export default function LandingPage() {
             </div>
 
             <div
-              className="bg-white rounded-2xl p-7 flex flex-col max-md:col-span-full"
-              style={{
-                gridColumn: "8 / 13",
-                gridRow: "1",
-                border: "1px solid #e8e8e4",
-              }}
+              className="bg-white rounded-2xl p-7 flex flex-col col-span-5 max-md:col-span-full"
+              style={{ border: "1px solid #e8e8e4" }}
             >
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center mb-5"
@@ -514,12 +503,8 @@ export default function LandingPage() {
             </div>
 
             <div
-              className="bg-white rounded-2xl p-7 flex flex-col max-md:col-span-full"
-              style={{
-                gridColumn: "1 / 6",
-                gridRow: "2",
-                border: "1px solid #e8e8e4",
-              }}
+              className="bg-white rounded-2xl p-7 flex flex-col col-span-5 max-md:col-span-full"
+              style={{ border: "1px solid #e8e8e4" }}
             >
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center mb-5"
@@ -555,12 +540,8 @@ export default function LandingPage() {
             </div>
 
             <div
-              className="rounded-2xl p-7 flex flex-col max-md:col-span-full"
-              style={{
-                gridColumn: "6 / 13",
-                gridRow: "2",
-                background: "#fe5933",
-              }}
+              className="rounded-2xl p-7 flex flex-col col-span-7 max-md:col-span-full"
+              style={{ background: "#fe5933" }}
             >
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center mb-5"

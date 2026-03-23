@@ -87,22 +87,16 @@ const ProductMockup = () => {
             </h3>
 
             {/* Passage text */}
-            <div className="space-y-1 mb-5">
-              {[
-                "Mars is the fourth planet from the Sun. It is called",
-                "the Red Planet because iron oxide on its surface gives",
-                "it a reddish appearance. Mars has two small moons,",
-                "Phobos and Deimos. Scientists believe Mars once had",
-                "liquid water flowing across its rocky surface.",
-              ].map((line, i) => (
-                <p
-                  key={i}
-                  style={{ fontSize: "11px", color: "#555", lineHeight: "1.6" }}
-                >
-                  {line}
-                </p>
-              ))}
-            </div>
+            <p
+              className="mb-5"
+              style={{ fontSize: "11px", color: "#555", lineHeight: "1.6" }}
+            >
+              Mars is the fourth planet from the Sun. It is called the Red
+              Planet because iron oxide on its surface gives it a reddish
+              appearance. Mars has two small moons, Phobos and Deimos.
+              Scientists believe Mars once had liquid water flowing across its
+              rocky surface.
+            </p>
 
             {/* Divider */}
             <div className="border-t mb-4" style={{ borderColor: "#f0f0ee" }} />
