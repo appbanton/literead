@@ -1,128 +1,137 @@
 <div align="center">
   <br />
-    <a href="https://www.youtube.com/watch?v=XUkNR-JfHwo" target="_blank">
-      <img src="public/readme/hero.png" alt="Project Banner">
-    </a>
+  <img src="public/readme/hero.png" alt="Literead — AI Reading Coach for Kids" />
+  <br />
   <br />
 
   <div>
-    <img src="https://img.shields.io/badge/-Next.JS-black?style=for-the-badge&logoColor=white&logo=nextdotjs&color=black" alt="next.js" />
-    <img src="https://img.shields.io/badge/-Vapi-black?style=for-the-badge&logoColor=white&logo=vapi.com&color=green" alt="next.js" />
-    <img src="https://img.shields.io/badge/-Tailwind-00BCFF?style=for-the-badge&logo=tailwind-css&logoColor=white" />
+    <img src="https://img.shields.io/badge/-Next.js-black?style=for-the-badge&logoColor=white&logo=nextdotjs&color=black" alt="Next.js" />
+    <img src="https://img.shields.io/badge/-Vapi-black?style=for-the-badge&logoColor=white&color=1a1a1a" alt="Vapi" />
+    <img src="https://img.shields.io/badge/-Supabase-black?style=for-the-badge&logo=supabase&logoColor=white&color=3ECF8E" alt="Supabase" />
+    <img src="https://img.shields.io/badge/-Tailwind-black?style=for-the-badge&logo=tailwind-css&logoColor=white&color=06B6D4" alt="Tailwind CSS" />
   </div>
 
-  <h3 align="center">SaaS App - LMS with Next.js, Supabase & Payments</h3>
+  <br />
 
-   <div align="center">
-     Build this project step by step with our detailed tutorial on <a href="https://www.youtube.com/watch?v=XUkNR-JfHwo" target="_blank"><b>JavaScript Mastery</b></a> YouTube. Join the JSM family!
-    </div>
+  <h2>Literead</h2>
+  <p><strong>AI reading comprehension coach for students from Pre-K through Grade 12.</strong></p>
+  <p>
+    Students read a passage, then have a real voice conversation with an AI coach that guides them through
+    Barrett's Taxonomy — from literal recall through to critical evaluation and personal reflection.
+    Built to help struggling readers build real comprehension, one conversation at a time.
+  </p>
+
+  <br />
+
+  <a href="https://literead.com" target="_blank">
+    <img src="https://img.shields.io/badge/Visit%20Literead-fe5933?style=for-the-badge" alt="Visit Literead" />
+  </a>
+
+<br /><br />
+
 </div>
 
-## 📋 <a name="table">Table of Contents</a>
+---
 
-1. 🤖 [Introduction](#introduction)
-2. ⚙️ [Tech Stack](#tech-stack)
-3. 🔋 [Features](#features)
-4. 🤸 [Quick Start](#quick-start)
-5. 🔗 [Assets](#links)
-6. 🚀 [More](#more)
+## How It Works
 
-## 🚨 Tutorial
+1. **Student reads a passage** — chosen from a library filtered by grade level, subject, and lesson type
+2. **Student taps "Start Discussion"** — a voice session begins immediately in the browser
+3. **AI coach asks questions** — following Barrett's Taxonomy, starting at literal recall and working up to inference, evaluation, and appreciation, calibrated to the student's grade level
+4. **Session is saved** — the full transcript is stored and visible on the student's journey page
+5. **Progress is tracked** — completed passages, session history, and remaining sessions are surfaced on the dashboard
 
-This repository contains the code corresponding to an in-depth tutorial available on our YouTube channel, <a href="https://www.youtube.com/@javascriptmastery/videos" target="_blank"><b>JavaScript Mastery</b></a>.
+---
 
-If you prefer visual learning, this is the perfect resource for you. Follow our tutorial to learn how to build projects like these step-by-step in a beginner-friendly manner!
+## Tech Stack
 
-<a href="https://www.youtube.com/watch?v=XUkNR-JfHwo" target="_blank"><img src="https://github.com/sujatagunale/EasyRead/assets/151519281/1736fca5-a031-4854-8c09-bc110e3bc16d" /></a>
+**[Next.js](https://nextjs.org/)** — App Router, server components, API routes, full-stack React
 
-## <a name="introduction">🤖 Introduction</a>
+**[Vapi](https://vapi.ai/)** — Voice AI orchestration. Manages the WebRTC pipeline, STT → LLM → TTS loop, and real-time event streaming
 
-Create an LMS SaaS app from scratch featuring user authentication, subscriptions, and payments using Next.js, Supabase, and Stripe! You'll build and deploy a real-time teaching platform with Vapi, integrate an AI vocal agent, and deliver seamless, interactive learning sessions.
+**[Deepgram](https://deepgram.com/)** — Speech-to-text (nova-2) for student speech transcription; text-to-speech (Aura-2) for the AI coach voice
 
-If you're getting started and need assistance or face any bugs, join our active Discord community with over **50k+** members. It's a place where people help each other out.
+**[OpenAI](https://openai.com/)** — GPT-4o-mini powers the reading coach. Structured instruction-following for Barrett's Taxonomy Q&A on provided passage content
 
-<a href="https://discord.com/invite/n6EdbFJ" target="_blank"><img src="https://github.com/sujatagunale/EasyRead/assets/151519281/618f4872-1e10-42da-8213-1d69e486d02e" /></a>
+**[Clerk](https://clerk.com/)** — Authentication, user management, and session handling
 
-## <a name="tech-stack">⚙️ Tech Stack</a>
+**[Supabase](https://supabase.com/)** — PostgreSQL database for passages, transcripts, bookmarks, subscriptions, and user progress
 
-- **[Clerk](https://jsm.dev/converso-clerk)** is a unified platform for authentication, user management, and billing. It offers embeddable UI components, flexible APIs, and admin dashboards for secure user management. Clerk also simplifies subscription management, allowing you to define plans, create pricing pages, and control access based on subscription tiers—all in one solution.
+**[Paddle](https://paddle.com/)** — Subscription billing and checkout. Manages plan tiers, monthly session resets, and payment events via webhook
 
-* **[Next.js](https://nextjs.org/)** is a powerful React framework that enables the development of fast, scalable web applications with features like server-side rendering, static site generation, and API routes for building full-stack applications.
+**[Sentry](https://sentry.io/)** — Error tracking and performance monitoring in production
 
-* **[Sentry](https://jsm.dev/converso-sentry)** is an error tracking and performance monitoring tool that helps developers fix bugs faster by providing real-time alerts, stack traces, and performance insights.
+**[shadcn/ui](https://ui.shadcn.com/)** + **[Tailwind CSS](https://tailwindcss.com/)** — Component library and utility-first styling
 
-* **[shadcn/ui](https://ui.shadcn.com/)** is a customizable component library built on Radix UI and Tailwind CSS. It offers a modern, accessible design system with pre-built components that are easy to theme and extend, making it ideal for building polished UIs with minimal effort.
+**[TypeScript](https://www.typescriptlang.org/)** — End-to-end type safety
 
-- **[Supabase](https://supabase.com/)** is an open-source backend-as-a-service platform that provides instant APIs, real-time subscriptions, authentication, storage, and a PostgreSQL database, enabling developers to build scalable and secure applications with ease.
+---
 
-* **[Tailwind CSS](https://tailwindcss.com/)** is a utility-first CSS framework that allows developers to design custom user interfaces by applying low-level utility classes directly in HTML, streamlining the design process.
-* **[TypeScript](https://www.typescriptlang.org/)** is a superset of JavaScript that adds static typing, providing better tooling, code quality, and error detection for developers, making it ideal for building large-scale applications.
+## Features
 
-- **[Vapi](https://jsm.dev/converso-vapi)** is a developer-centric voice AI platform that enables the creation of conversational voice agents with low-latency voice interactions, speech-to-text, and text-to-speech capabilities. It supports multilingual conversations, customizable voices, and seamless integration with various AI models and tools.
+**AI Voice Reading Coach** — A patient, encouraging AI coach that speaks to students, waits for their answers, scaffolds when they struggle, and adapts its language to their grade level.
 
-* **[Zod](https://zod.dev/)** is a TypeScript-first schema validation library that provides a simple and expressive way to define and validate data structures. Zod ensures data integrity by catching errors early during development.
+**Barrett's Taxonomy Framework** — Five levels of reading comprehension built into every session:
 
-## <a name="features">🔋 Features</a>
+- Level 1: Literal recall — what did the passage say?
+- Level 2: Reorganisation — summarise, sequence, classify
+- Level 3: Inference — read between the lines
+- Level 4: Evaluation — was the character right? Do you agree?
+- Level 5: Appreciation — how did it make you feel?
 
-👉 **AI Voice Agents**: Take tutoring sessions with voiced AIs specializing in the topics you want to get better at.
+**Grade-Calibrated Sessions** — Pre-K–2 targets levels 1–2. Grades 3–5 push to level 3. Grades 6–8 reach evaluation. Grades 9–12 go all five levels.
 
-👉 **Authentication**: Secure user sign-up and sign-in with Clerk; Google authentication and many more.
+**Passage Library** — Filterable by grade level, lesson type (Phonics, Comprehension, Sight Words, Story, Mixed), and subject. Public library available to all subscribers.
 
-👉 **Billing & Subscriptions**: Easily manage plans, upgrades, and payment details.
+**Session Transcripts** — Every conversation is saved. Students and parents can replay the full exchange on the My Journey page.
 
-👉 **Bookmarks and Session History**: Let users organise their learning by bookmarking tutors and accessing previous sessions.
+**Progress Dashboard** — Completed passages, minutes read, sessions remaining, and plan status in one place.
 
-👉 **Code Reusability**: Leverage reusable components and a modular codebase for efficient development.
+**Bookmarks** — Students can save passages for later.
 
-👉 **Create a Tutor**: Create your own AI tutors, choosing a subject, topic, and style of conversation.
+**Subscription Gating** — Sessions are metered per plan. A paywall modal surfaces inline when a student runs out, with direct upgrade flow.
 
-👉 **Cross-Device Compatibility**: Fully responsive design that works seamlessly across all devices.
+**Responsive** — Full mobile and desktop support.
 
-👉 **Database Integration**: Uses Supabase for real-time data handling and storage needs.
+---
 
-👉 **Modern UI/UX**: Clean, responsive design built with Tailwind CSS and shadcn/ui for a sleek user experience.
+## Subscription Plans
 
-👉 **Scalable Tech Stack**: Built with Next.js for a fast, production-ready web application that scales seamlessly.
+| Plan  | Price    | Sessions / month |
+| ----- | -------- | ---------------- |
+| Basic | $20 / mo | 12               |
+| Core  | $30 / mo | 20               |
+| Pro   | $50 / mo | 30               |
 
-👉 **Search Functionality**: Find tutors quickly with robust filters and search bar.
+Sessions reset monthly on the subscription anniversary date. Unused sessions do not roll over. All plans include access to the full passage library across every grade level.
 
-and many more, including code architecture and reusability.
+---
 
-## <a name="quick-start">🤸 Quick Start</a>
+## Voice AI Architecture
 
-Follow these steps to set up the project locally on your machine.
+Vapi acts as an orchestration layer — it does not run the AI itself. Each session chains four services:
 
-**Prerequisites**
-
-Make sure you have the following installed on your machine:
-
-- [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/en)
-- [npm](https://www.npmjs.com/) (Node Package Manager)
-
-**Cloning the Repository**
-
-```bash
-git clone https://github.com/adrianhajdin/saas-app.git
-cd saas-app
+```
+Browser (WebRTC)
+    ↓
+Vapi orchestration     $0.0500 / min
+    ↓
+Deepgram nova-2 (STT)  $0.0059 / min
+    ↓
+OpenAI GPT-4o-mini     $0.006–0.012 / min
+    ↓
+Deepgram Aura-2 (TTS)  $0.0108 / min
 ```
 
-**Installation**
+Total cost per session (5 min avg): **~$0.37–$0.40**
 
-Install the project dependencies using npm:
+Vapi credits cover the orchestration fee only. OpenAI and Deepgram are billed separately to those providers.
 
-```bash
-npm install
-```
+---
 
-**Set Up Environment Variables**
-
-Create a new file named `.env` in the root of your project and add the following content:
+## Environment Variables
 
 ```env
-# Sentry
-SENTRY_AUTH_TOKEN=
-
 # Vapi
 NEXT_PUBLIC_VAPI_WEB_TOKEN=
 
@@ -136,33 +145,20 @@ NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+
+# Paddle
+NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=
+NEXT_PUBLIC_PADDLE_PRICE_ID_BASIC=
+NEXT_PUBLIC_PADDLE_PRICE_ID_CORE=
+NEXT_PUBLIC_PADDLE_PRICE_ID_PRO=
+
+# Sentry
+SENTRY_AUTH_TOKEN=
 ```
 
-Replace the placeholder values with your actual ImageKit, NeonDB, Upstash, and Resend credentials. You can obtain these credentials by signing up on: [Supabase](https://supabase.com/dashboard), [Clerk](https://jsm.dev/converso-clerk), [Sentry](https://jsm.dev/converso-sentry), [Vapi](https://jsm.dev/converso-vapi).
+---
 
-**Running the Project**
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser to view the project.
-
-## <a name="links">🔗 Assets</a>
-
-Assets and snippets used in the project can be found in the **[video kit](https://jsm.dev/converso-kit)**.
-
-<a href="https://jsm.dev/converso-kit" target="_blank">
-  <img src="public/readme/videokit.jpg" alt="Video Kit Banner">
-</a>
-
-## <a name="more">🚀 More</a>
-
-**Advance your skills with Next.js Pro Course**
-
-Enjoyed creating this project? Dive deeper into our PRO courses for a richer learning adventure. They're packed with
-detailed explanations, cool features, and exercises to boost your skills. Give it a go!
-
-<a href="https://jsm.dev/converso-nextjs" target="_blank">
-  <img src="public/readme/jsmpro.jpg" alt="Project Banner">
-</a>
+<div align="center">
+  <p>Built for kids who deserve better than a worksheet.</p>
+  <a href="https://literead.com" target="_blank"><strong>literead.com</strong></a>
+</div>

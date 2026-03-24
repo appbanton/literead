@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { policies, type Policy } from "@/lib/policies";
 
 function PolicyModal({
@@ -10,10 +10,21 @@ function PolicyModal({
   policy: Policy;
   onClose: () => void;
 }) {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
-      style={{ background: "rgba(0,0,0,0.75)" }}
+      style={{
+        background: "rgba(0,0,0,0.75)",
+        backdropFilter: "blur(6px)",
+        WebkitBackdropFilter: "blur(6px)",
+      }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -71,8 +82,7 @@ const Footer = () => {
       >
         <div className="container mx-auto px-6 max-w-6xl">
           {/* DESKTOP */}
-          <div className="hidden sm:flex items-center justify-between">
-            {/* Left: copyright + links all on one line */}
+          <div className="hidden md:flex items-center justify-between">
             <div className="flex items-center">
               <p className="text-sm" style={{ color: "#555" }}>
                 © {new Date().getFullYear()} Literead
@@ -113,8 +123,6 @@ const Footer = () => {
                 </span>
               ))}
             </div>
-
-            {/* Right */}
             <p className="text-sm" style={{ color: "#555" }}>
               Powered by{" "}
               <a
@@ -132,7 +140,7 @@ const Footer = () => {
           </div>
 
           {/* MOBILE */}
-          <div className="flex sm:hidden flex-col items-center gap-2">
+          <div className="flex md:hidden flex-col items-center gap-2">
             <p className="text-sm" style={{ color: "#555" }}>
               © {new Date().getFullYear()} Literead
             </p>
